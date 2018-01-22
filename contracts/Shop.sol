@@ -17,33 +17,33 @@ Eventually, you will refactor it to include:
 */
 
 contract Shop is Funded {
-    
+
     address private root; //Root administrator
     mapping (address => bool) private administrators;
-    
+
     mapping (address => bool) private merchants; //key = merchant address
     mapping (address => uint256) private merchantsSales; //account merchant's sales
     uint8 private commissionToMerchant; //in percentage; i.e. = 5 then it means 5%. the Shop will keep 5% of the puchases to merchants' products
-    
-    struct product {
+
+    struct Product {
         address merchant;
         uint256 unitPrice;
         uint stock;
     }
-    mapping (address => mapping (bytes32 => product)) public products; //keys = merchant address, productId
-    
-    struct purchase {
+    mapping (address => mapping (bytes32 => Product)) public products; //keys = merchant address, productId
+
+    struct Purchase {
         address merchant;
         bytes32 productId;
         uint units;
         uint256 unitPrice;
         uint256 total;
     }
-    mapping (address => purchase[]) public purchases; //key = buyer address
-    
+    mapping (address => Purchase[]) public purchases; //key = buyer address
+
     event LogShopNew (address _sender);
     //Constructor
-    function Shop () 
+    function Shop ()
         Funded (msg.sender)
         public
     {
@@ -51,30 +51,22 @@ contract Shop is Funded {
         administrators[msg.sender] = true; //add root to the administrators
         merchants[msg.sender] = true; //by default the first merchant is root
         commissionToMerchant = 5;
-        
+
         LogShopNew (msg.sender);
     }
-    
+
     modifier onlyRoot () { require(msg.sender == root); _; }
     modifier onlyAdminstrators () { require(administrators[msg.sender]); _; }
     modifier onlyMerchants () { require(merchants[msg.sender]); _; }
 
-    function getProductStock (address _merchant, bytes32 _productId)
+    function getProductInfo (address _merchant, bytes32 _productId)
         public
         constant
-        returns (uint _stock)
+        returns (uint _unitPrice, uint _stock)
     {
-        return (products[_merchant][_productId].stock);
+        return (products[_merchant][_productId].unitPrice, products[_merchant][_productId].stock);
     }
-    
-    function getProductUnitPrice (address _merchant, bytes32 _productId)
-        public
-        constant
-        returns (uint256 _unitPrice)
-    {
-        return (products[_merchant][_productId].unitPrice);        
-    }
-    
+
     function isMerchant (address _merchant)
         public
         constant
@@ -83,15 +75,15 @@ contract Shop is Funded {
         return (merchants[_merchant]);
     }
 
-    function getMerchantBalance (address _merchant)
+    function getMerchantInfo (address _merchant)
         public
         constant
         returns (uint256 _balance)
     {
         return (merchantsSales[_merchant]);
     }
-    
-    
+
+
     event LogShopAddAdministrator (address _sender, address _newAdministrator);
     // To add a new admin
     function addAdministrator (address _newAdministrator)
@@ -104,7 +96,7 @@ contract Shop is Funded {
         LogShopAddAdministrator (msg.sender, _newAdministrator);
         return true;
     }
-    
+
     event LogShopRemoveAdministrator (address _sender, address _adminToRemove);
     // Remove an admin. Root cannot be removed
     function removeAdministrator (address _adminToRemove)
@@ -117,7 +109,7 @@ contract Shop is Funded {
         LogShopRemoveAdministrator (msg.sender, _adminToRemove);
         return true;
     }
-    
+
     event LogShopAddMerchant (address _sender, address _merchant);
     // To add merchants. Only administrators.
     // A merchan canot be an administrator
@@ -127,12 +119,12 @@ contract Shop is Funded {
         returns (bool _success)
     {
         require(!administrators[_merchant]);
-        
+
         merchants[_merchant] = true;
         LogShopAddMerchant (msg.sender,  _merchant);
         return true;
     }
-    
+
     event LogShopRemoveMerchant (address _sender, address _merchant);
     // Remove merchants. Only administrators
     function removeMerchant (address _merchant)
@@ -141,12 +133,12 @@ contract Shop is Funded {
         returns (bool _success)
     {
         require(merchants[_merchant]);
-        
+
         delete merchants[_merchant];
         LogShopRemoveMerchant (msg.sender,  _merchant);
         return true;
     }
-    
+
     event LogShopAddShopProduct (address _sender, bytes32 _id, uint256 _unitPrice, uint _stock);
     // Add a product. Only admins
     // This is the default method to add products. It assigns them to root as the merchant
@@ -159,7 +151,7 @@ contract Shop is Funded {
         LogShopAddShopProduct (msg.sender, _productId, _unitPrice, _stock);
         return true;
     }
-    
+
     event LogShopRemoveShopProduct (address _sender, bytes32 _productId);
     // Remove a product. Only admins
     function removeShopProduct (bytes32 _productId)
@@ -171,7 +163,7 @@ contract Shop is Funded {
         LogShopRemoveShopProduct (msg.sender, _productId);
         return true;
     }
-    
+
     event LogShopAddMerchantProduct (address _merchant, bytes32 _productId, uint256 _unitPrice, uint _stock);
     // A merchant adds a new product to the contract
     function addMerchantProduct (bytes32 _productId, uint256 _unitPrice, uint _stock)
@@ -181,7 +173,7 @@ contract Shop is Funded {
     {
         addProduct (msg.sender, _productId, _unitPrice, _stock);
         LogShopAddMerchantProduct (msg.sender, _productId, _unitPrice, _stock);
-        return true;        
+        return true;
     }
 
     event LogShopRemoveMerchantProduct (address _sender, bytes32 _productId);
@@ -195,8 +187,8 @@ contract Shop is Funded {
         LogShopRemoveMerchantProduct (msg.sender, _productId);
         return true;
     }
-    
-    // PRIVATE 
+
+    // PRIVATE
     // To add a new product
     function addProduct (address _merchant, bytes32 _productId, uint256 _unitPrice, uint _stock)
         private
@@ -206,7 +198,7 @@ contract Shop is Funded {
         {
             products[_merchant][_productId].unitPrice = _unitPrice;
             products[_merchant][_productId].stock += _stock;
-        } 
+        }
         else // The product is new
         {
             products[_merchant][_productId].merchant = msg.sender;
@@ -215,7 +207,7 @@ contract Shop is Funded {
         }
         return true;
     }
-    
+
     // PRIVATE
     // To remove a product
     function removeProduct (address _merchant, bytes32 _productId)
@@ -225,7 +217,7 @@ contract Shop is Funded {
         delete products[_merchant][_productId];
         return true;
     }
-    
+
     event LogShopPurchaseProduct (address _sender, address _merchant, bytes32 _productId, uint _units, uint256 _unitPrice, uint256 _total);
     // The buyer shall have funded his account BEFORE he can purchase any product
     // The buyer shall have enough balance to purchase the products
@@ -243,16 +235,16 @@ contract Shop is Funded {
         uint256 unitPrice = products[_merchant][_productId].unitPrice;
         uint256 total = unitPrice * _units; // calculate total required balance
 
-        purchases[msg.sender].push(purchase(_merchant, _productId, _units, unitPrice, total)); //register purchase
+        purchases[msg.sender].push(Purchase(_merchant, _productId, _units, unitPrice, total)); //register purchase
         products[_merchant][_productId].stock -= _units; //update stock
-        
+
         require(spendFunds (total)); //deduct total from buyer
         merchantsSales[_merchant] += total; //account the purchase to the merchant
 
         LogShopPurchaseProduct (msg.sender, _merchant, _productId, _units, unitPrice, total);
         return true;
     }
-    
+
     event LogShopMerchantWithdrawFunds (address _sender, uint256 _transferAmount, uint256 _commission);
     // Merchants withdraw sales funds executing this function
     // The contract will not send funds to any account, instead merchants shall withdraw funds from contract
@@ -264,7 +256,7 @@ contract Shop is Funded {
     {
         require(msg.sender != root); //the root cannot withdraw his own funds
         require(merchantsSales[msg.sender] > 0); //require positive merchant balance | prevents re-entry
-        
+
         uint256 balance = merchantsSales[msg.sender];
         uint256 transferAmount = balance*((100-commissionToMerchant)/100);
         merchantsSales[msg.sender] = 0; //optimistic accounting
