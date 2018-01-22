@@ -67,14 +67,6 @@ contract Shop is Funded {
         return (products[_merchant][_productId].unitPrice, products[_merchant][_productId].stock);
     }
 
-    function isMerchant (address _merchant)
-        public
-        constant
-        returns (bool _is)
-    {
-        return (merchants[_merchant]);
-    }
-
     function getMerchantInfo (address _merchant)
         public
         constant
@@ -83,31 +75,38 @@ contract Shop is Funded {
         return (merchantsSales[_merchant]);
     }
 
-
-    event LogShopAddAdministrator (address _sender, address _newAdministrator);
+    event LogShopAddAdministrator (address _sender, address _administrator);
     // To add a new admin
-    function addAdministrator (address _newAdministrator)
+    function addAdministrator (address _administrator)
         onlyRoot
         public
         returns (bool _success)
     {
-        require (_newAdministrator != 0);
-        administrators[_newAdministrator] = true;
-        LogShopAddAdministrator (msg.sender, _newAdministrator);
+        require (_administrator != 0);
+        administrators[_administrator] = true;
+        LogShopAddAdministrator (msg.sender, _administrator);
         return true;
     }
 
-    event LogShopRemoveAdministrator (address _sender, address _adminToRemove);
+    event LogShopRemoveAdministrator (address _sender, address _administrator);
     // Remove an admin. Root cannot be removed
-    function removeAdministrator (address _adminToRemove)
+    function removeAdministrator (address _administrator)
         onlyRoot
         public
         returns (bool _success)
     {
-        require (_adminToRemove != root); //Root cannot be removeAdministrator
-        administrators[_adminToRemove] = false;
-        LogShopRemoveAdministrator (msg.sender, _adminToRemove);
+        require (_administrator != root); //Root cannot be removeAdministrator
+        administrators[_administrator] = false;
+        LogShopRemoveAdministrator (msg.sender, _administrator);
         return true;
+    }
+
+    function isAdministrator (address _administrator)
+        public
+        constant
+        returns (bool _is)
+    {
+        return (administrators[_administrator]);
     }
 
     event LogShopAddMerchant (address _sender, address _merchant);
@@ -137,6 +136,14 @@ contract Shop is Funded {
         delete merchants[_merchant];
         LogShopRemoveMerchant (msg.sender,  _merchant);
         return true;
+    }
+
+    function isMerchant (address _merchant)
+        public
+        constant
+        returns (bool _is)
+    {
+        return (merchants[_merchant]);
     }
 
     event LogShopAddShopProduct (address _sender, bytes32 _id, uint256 _unitPrice, uint _stock);
