@@ -1,6 +1,6 @@
 pragma solidity ^0.4.4;
 
-import "./Funded.sol";
+import "./MyShared/Funded.sol";
 
 /*
 A shopfront
@@ -23,7 +23,6 @@ contract Shop is Funded {
 
     mapping (address => bool) private merchants; //key = merchant address
     mapping (address => uint256) private merchantsSales; //account merchant's sales
-    uint8 private commissionToMerchant; //in percentage; i.e. = 5 then it means 5%. the Shop will keep 5% of the puchases to merchants' products
 
     struct Product {
         address merchant;
@@ -50,7 +49,6 @@ contract Shop is Funded {
         root = msg.sender;
         administrators[msg.sender] = true; //add root to the administrators
         merchants[msg.sender] = true; //by default the first merchant is root
-        commissionToMerchant = 5;
 
         LogShopNew (msg.sender);
     }
@@ -252,7 +250,7 @@ contract Shop is Funded {
         return true;
     }
 
-    event LogShopMerchantWithdrawFunds (address _sender, uint256 _transferAmount, uint256 _commission);
+    event LogShopMerchantWithdrawFunds (address _sender, uint256 _transferAmount);
     // Merchants withdraw sales funds executing this function
     // The contract will not send funds to any account, instead merchants shall withdraw funds from contract
     function merchantWithdrawFunds ()
@@ -265,12 +263,11 @@ contract Shop is Funded {
         require(merchantsSales[msg.sender] > 0); //require positive merchant balance | prevents re-entry
 
         uint256 balance = merchantsSales[msg.sender];
-        uint256 transferAmount = balance*((100-commissionToMerchant)/100);
         merchantsSales[msg.sender] = 0; //optimistic accounting
 
-        msg.sender.transfer(transferAmount);
+        msg.sender.transfer(balance);
 
-        LogShopMerchantWithdrawFunds (msg.sender, transferAmount, balance-transferAmount);
+        LogShopMerchantWithdrawFunds (msg.sender, balance);
         return true;
     }
 }

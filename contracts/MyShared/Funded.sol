@@ -80,6 +80,7 @@ contract Funded is Stoppable {
     {
         require (contractBalance > 0); //prevent re-entry
         require (depositors[msg.sender] >= _amount); //prevent over spending
+        require (_amount > 0);
 
         contractBalance -= _amount; //optimistic accounting
         depositors[msg.sender] -= _amount; //optimistic accounting
