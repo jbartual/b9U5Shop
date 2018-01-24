@@ -93,7 +93,7 @@ contract Funded is Stoppable {
 
     event LogFundedSpendFunds (address _sender, uint256 _amount);
     // Allow a depositor to spend balance in the contract's services or goods
-    function spendFunds (uint _amount)
+    function spendFunds (uint256 _amount)
         onlyDepositors
         onlyIfRunning
         public
@@ -102,7 +102,10 @@ contract Funded is Stoppable {
         require (contractBalance > 0); //prevent major re-entry
         require (depositors[msg.sender] >= _amount); //prevent over spending
 
-        depositors[msg.sender] -= _amount; //optimistic accounting
+          if (_amount == depositors[msg.sender] )
+            delete depositors[msg.sender];
+          else
+            depositors[msg.sender] -= _amount; //optimistic accounting
 
         contractProfit += _amount; //account the spending
 
