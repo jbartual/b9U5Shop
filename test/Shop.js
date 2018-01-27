@@ -14,7 +14,7 @@ contract('Shop', function(accounts) {
     })
   });
 
-/*
+
   it("By default a0 is administrator and merchant", () => {
     console.log ("it: By default a0 is administrator and merchant");
     return i.isAdministrator.call(a0).then((r) => {
@@ -196,14 +196,14 @@ contract('Shop', function(accounts) {
         return web3.eth.getBalance(a1);
     }).then((r) => {
         console.log ("    a1 address balance = " + web3.fromWei(r,"ether").toString());
-        return i.getMerchantInfo.call(a1);
+        return i.getMerchantSalesInfo.call(a1);
     }).then((r) => {
         console.log ("    a1 balance in Shop account = " + web3.fromWei(r,"ether").toString());
         assert.equal(+r, +p2UnitPrice*p2Stock, "    ERROR: a1 balance shall be of " + (p2UnitPrice*p2Stock).toString());
         console.log ("    a1 withdraws his funds...");
         return i.merchantWithdrawFunds({from:a1});
     }).then(() => {
-        return i.getMerchantInfo.call(a1);
+        return i.getMerchantSalesInfo.call(a1);
     }).then((r) => {
         console.log ("    a1 balance in Shop account = " + web3.fromWei(r,"ether").toString());
         assert.equal(+r, 0, "    ERROR: a1 balance shall be 0");
@@ -212,7 +212,7 @@ contract('Shop', function(accounts) {
         console.log ("    a1 address balance = " + web3.fromWei(r,"ether").toString());
     });
   });
-*/
+
 
   it("a1 adds 1 expensive product. a2 and a3 share the purchase of it 80%-20%", () => {
     let a1ProductId = "merchant01AA";
@@ -256,11 +256,11 @@ contract('Shop', function(accounts) {
     }).then((r) => {
         console.log ("    a3 balance in Shop account = " + web3.fromWei(r,"ether").toString());
         assert.equal(+r, +a3Deposit, "    ERROR: a3 deposit wasn't successful");
-        return i.getMerchantInfo.call(a1);
+        return i.getMerchantSalesInfo.call(a1);
     }).then((r) => {
         console.log ("    a1 (merchant) balance in the Shop (should be 0) = " + r.toString());
         console.log ("    a2 start the shared purchase of a1 product...")        
-        return i.purchaseProduct(a1, a1ProductId, 1, a2Deposit, {from:a2});
+        return i.purchaseSharedProduct(a1, a1ProductId, 1, a2Deposit, {from:a2});
     }).then((r) => {
         txHash =  r.logs[2].args._txHash;
         console.log ("    Tx Hash = " + txHash);
@@ -274,7 +274,7 @@ contract('Shop', function(accounts) {
         console.log ("      Unit Price = " + web3.fromWei(r[0],"ether").toString());
         console.log ("      Stock = " + r[1].toString());
         assert.equal(+r[1], 0, "    ERROR: stock shall be 0");
-        return i.getMerchantInfo.call(a1);
+        return i.getMerchantSalesInfo.call(a1);
     }).then((r) => {
         console.log ("    a1 (merchant) balance in the Shop (should be 0) = " + r.toString());
         assert.equal(+r, 0, "    ERROR: a1 balance shall be 0");
@@ -285,10 +285,10 @@ contract('Shop', function(accounts) {
         return i.getDepositorBalance.call(a3);
     }).then((r) => {
         console.log ("    a3 balance in Shop account = " + web3.fromWei(r,"ether").toString());
-        return i.getMerchantInfo.call(a1);
+        return i.getMerchantSalesInfo.call(a1);
     }).then((r) => {
         console.log ("    a1 (merchant) balance in the Shop = " + web3.fromWei(r,"ether").toString());
         assert.equal(+r, +a1UnitPrice, "    ERROR: a1 balance shall be " + a1UnitPrice.toString());
     });
-  })
+  });
 });

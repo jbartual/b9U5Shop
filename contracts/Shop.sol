@@ -1,7 +1,7 @@
 pragma solidity ^0.4.4;
 
 import "./MyShared/Funded.sol";
-import "./OpenZeppelin/SafeMath.sol";
+import "./ProductManager.sol";
 
 /*
 A shopfront
@@ -17,20 +17,11 @@ Eventually, you will refactor it to include:
 - add the ability to pay with a third-party token.
 */
 
-contract Shop is Funded {
-    using SafeMath for uint256;
-
+contract Shop is Funded, ProductManager {
     address private root; //Root administrator
     mapping (address => bool) private administrators;
 
-    mapping (address => bool) private merchants; //key = merchant address
     mapping (address => uint256) private merchantsSales; //account merchant's sales
-
-    struct Product {
-        uint256 unitPrice;
-        uint stock;
-    }
-    mapping (address => mapping (bytes32 => Product)) public products; //keys = merchant address, productId
 
     struct Purchase {
         address[] buyers; //a purchase could be shared by more than one buyer
@@ -50,30 +41,12 @@ contract Shop is Funded {
     {
         root = msg.sender;
         administrators[msg.sender] = true; //add root to the administrators
-        merchants[msg.sender] = true; //by default the first merchant is root
 
         LogShopNew (msg.sender);
     }
 
     modifier onlyRoot () { require(msg.sender == root); _; }
-    modifier onlyAdminstrators () { require(administrators[msg.sender]); _; }
-    modifier onlyMerchants () { require(merchants[msg.sender]); _; }
-
-    function getProductInfo (address _merchant, bytes32 _productId)
-        public
-        constant
-        returns (uint _unitPrice, uint _stock)
-    {
-        return (products[_merchant][_productId].unitPrice, products[_merchant][_productId].stock);
-    }
-
-    function getMerchantInfo (address _merchant)
-        public
-        constant
-        returns (uint256 _balance)
-    {
-        return (merchantsSales[_merchant]);
-    }
+    modifier onlyAdministrators () { require(administrators[msg.sender]); _; }
 
         event LogShopAddAdministrator (address _sender, address _administrator);
     // To add a new admin
@@ -109,40 +82,30 @@ contract Shop is Funded {
         return (administrators[_administrator]);
     }
 
-        event LogShopAddMerchant (address _sender, address _merchant);
-    // To add new merchants
     function addMerchant (address _merchant)
-        onlyAdminstrators
+        onlyAdministrators
         public
         returns (bool _success)
     {
         require(!administrators[_merchant]); // A merchan canot be an administrator
 
-        merchants[_merchant] = true;
-        LogShopAddMerchant (msg.sender,  _merchant);
-        return true;
+        return _addMerchant(_merchant);
     }
 
-        event LogShopRemoveMerchant (address _sender, address _merchant);
-    // To remove merchants
     function removeMerchant (address _merchant)
-        onlyAdminstrators
+        onlyAdministrators
         public
         returns (bool _success)
     {
-        require(merchants[_merchant]);
+        return _removeMerchant(_merchant);
+    }    
 
-        delete merchants[_merchant];
-        LogShopRemoveMerchant (msg.sender,  _merchant);
-        return true;
-    }
-
-    function isMerchant (address _merchant)
+    function getMerchantSalesInfo (address _merchant)
         public
         constant
-        returns (bool _is)
+        returns (uint256 _balance)
     {
-        return (merchants[_merchant]);
+        return (merchantsSales[_merchant]);
     }
 
         event LogShopMerchantWithdrawFunds (address _sender, uint256 _transferAmount);
@@ -166,35 +129,6 @@ contract Shop is Funded {
         return true;
     }
 
-        event LogShopAddProduct (address _sender, bytes32 _productId, uint256 _unitPrice, uint _stock);
-    // To add a new product
-    function addProduct (bytes32 _productId, uint256 _unitPrice, uint _stock)
-        onlyMerchants
-        onlyIfRunning
-        public
-        returns (bool _success)
-    {
-        products[msg.sender][_productId].unitPrice = _unitPrice;
-        products[msg.sender][_productId].stock += _stock;
-
-        LogShopAddProduct (msg.sender, _productId, _unitPrice, _stock);
-        return true;
-    }
-
-        event LogShopRemoveProduct (address _sender, bytes32 _productId);
-    // To remove a product
-    function removeProduct (bytes32 _productId)
-        onlyMerchants
-        onlyIfRunning
-        public
-        returns (bool _success)
-    {
-        delete products[msg.sender][_productId];
-
-        LogShopRemoveProduct (msg.sender, _productId);
-        return true;
-    }
-
         event LogShopPurchaseProduct (address _sender, address _merchant, bytes32 _productId, uint _units, uint256 _unitPrice, uint256 _total, uint256 _amount, bytes32 _txHash);
     // The buyer shall have funded his account BEFORE he can purchase any product
     // The buyer shall have enough balance to purchase the products
@@ -212,25 +146,42 @@ contract Shop is Funded {
         require (products[_merchant][_productId].stock >= _units); // check stock
         uint256 unitPrice = products[_merchant][_productId].unitPrice;
         uint256 total = unitPrice * _units; // calculate total required balance
+        require (_amount == total); //the buyer commits enough funds
+
         bytes32 txHash;
-
-        if (_amount >= total) //the purchase is not shared
-        {
-            txHash = registerPurchase (_merchant, _productId, _units, total, total); //register the purchase
-            spendFunds (total); //deduct total from buyer
-            merchantsSales[_merchant] += total; //account the purchase to the merchant
-            //here we could call a delivery function to send the products to the buyer
-        }
-        else //the purchase is shared
-        {
-            txHash = registerPurchase (_merchant, _productId, _units, total, _amount); //register the purchase
-            spendFunds (_amount); //deduct _amountPaid from buyer
-            //do not account the purchase to the merchant as the sale is not fully paid
-        }
-
+        txHash = registerPurchase (_merchant, _productId, _units, total, total); //register the purchase
         require(txHash != 0);
 
+        merchantsSales[_merchant] += total; //account the purchase to the merchant
+        spendFunds (total); //deduct total from buyer
+        //here we could call a delivery function to send the products to the buyer
+
         LogShopPurchaseProduct (msg.sender, _merchant, _productId, _units, unitPrice, total, _amount, txHash);
+        return txHash;
+    }
+
+        event LogShopPurchaseSharedProduct (address _sender, address _merchant, bytes32 _productId, uint _units, uint256 _unitPrice, uint256 _total, uint256 _amount, bytes32 _txHash);
+    // To be executed by the fist buyer of a shared purchase
+    function purchaseSharedProduct (address _merchant, bytes32 _productId, uint _units, uint256 _amount)
+        onlyDepositors
+        onlyIfRunning
+        public
+        returns (bytes32 _txHash)
+    {
+        require (_units > 0);
+        require (products[_merchant][_productId].stock >= _units); // check stock
+        uint256 unitPrice = products[_merchant][_productId].unitPrice;
+        uint256 total = unitPrice * _units; // calculate total required balance
+        require (_amount < total); //require to start a shared purchase with less amount than the purchase total
+
+        bytes32 txHash;
+        txHash = registerPurchase (_merchant, _productId, _units, total, _amount); //register the purchase
+        require(txHash != 0);
+        
+        spendFunds (_amount); //deduct _amountPaid from buyer
+        //do not account the purchase to the merchant as the sale is not fully paid
+        
+        LogShopPurchaseSharedProduct (msg.sender, _merchant, _productId, _units, unitPrice, total, _amount, txHash);
         return txHash;
     }
 

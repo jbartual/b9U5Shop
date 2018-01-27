@@ -1,0 +1,340 @@
+{
+  "contract_name": "ProductManager",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "stopContract",
+      "outputs": [
+        {
+          "name": "_success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_merchant",
+          "type": "address"
+        }
+      ],
+      "name": "isMerchant",
+      "outputs": [
+        {
+          "name": "_is",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getNewOwner",
+      "outputs": [
+        {
+          "name": "_newOwner",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "isStopped",
+      "outputs": [
+        {
+          "name": "_stop",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getOwner",
+      "outputs": [
+        {
+          "name": "_owner",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "changeOwner",
+      "outputs": [
+        {
+          "name": "_success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "resumeContract",
+      "outputs": [
+        {
+          "name": "_success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        },
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "products",
+      "outputs": [
+        {
+          "name": "unitPrice",
+          "type": "uint256"
+        },
+        {
+          "name": "stock",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "confirmChangeOwner",
+      "outputs": [
+        {
+          "name": "_success",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_merchant",
+          "type": "address"
+        },
+        {
+          "name": "_productId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getProductInfo",
+      "outputs": [
+        {
+          "name": "_unitPrice",
+          "type": "uint256"
+        },
+        {
+          "name": "_stock",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "payable": false,
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_sender",
+          "type": "address"
+        }
+      ],
+      "name": "LogProductManagerNew",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "_merchant",
+          "type": "address"
+        }
+      ],
+      "name": "LogShopAddMerchant",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "_merchant",
+          "type": "address"
+        }
+      ],
+      "name": "LogShopRemoveMerchant",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "_productId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "_unitPrice",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "_stock",
+          "type": "uint256"
+        }
+      ],
+      "name": "LogProductManagerAddProduct",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "_productId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "LogProductManagerRemoveProduct",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_sender",
+          "type": "address"
+        }
+      ],
+      "name": "LogStoppableStopContract",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_sender",
+          "type": "address"
+        }
+      ],
+      "name": "LogStoppableResumeContract",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_sender",
+          "type": "address"
+        }
+      ],
+      "name": "LogOwnedNew",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "_newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "LogOwnedChangeOwner",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "_newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "LogOwnedConfirmChangeOwner",
+      "type": "event"
+    }
+  ],
+  "unlinked_binary": "0x6060604052341561000f57600080fd5b5b5b5b60008054600160a060020a03191633600160a060020a038116919091179091557f3452aa652f56729b39a9198f36cd36bee3117c0112792f8707bab75d357e66e590604051600160a060020a03909116815260200160405180910390a15b5b600160a060020a033390811660009081526003602052604090819020805460ff191660011790557f983587b717c414a68974e2288938cc5e4ea5f8efbad2f692e162ad994acc8970919051600160a060020a03909116815260200160405180910390a15b5b61054e806100e56000396000f300606060405236156100885763ffffffff60e060020a60003504166312253a6c811461008d5780631a2f7167146100b45780633e2fe149146100e75780633f683b6a14610116578063893d20e81461013d578063a6f9dae11461016c578063c4bc5da51461019f578063d19a092b146101c6578063eae0438814610200578063fa874a9314610227575b600080fd5b341561009857600080fd5b6100a0610261565b604051901515815260200160405180910390f35b34156100bf57600080fd5b6100a0600160a060020a03600435166102d8565b604051901515815260200160405180910390f35b34156100f257600080fd5b6100fa6102fa565b604051600160a060020a03909116815260200160405180910390f35b341561012157600080fd5b6100a061030a565b604051901515815260200160405180910390f35b341561014857600080fd5b6100fa61031b565b604051600160a060020a03909116815260200160405180910390f35b341561017757600080fd5b6100a0600160a060020a036004351661032b565b604051901515815260200160405180910390f35b34156101aa57600080fd5b6100a06103c7565b604051901515815260200160405180910390f35b34156101d157600080fd5b6101e8600160a060020a0360043516602435610438565b60405191825260208201526040908101905180910390f35b341561020b57600080fd5b6100a061045c565b604051901515815260200160405180910390f35b341561023257600080fd5b6101e8600160a060020a03600435166024356104ef565b60405191825260208201526040908101905180910390f35b6000805433600160a060020a0390811691161461027d57600080fd5b6001805460a060020a60ff02191660a060020a1790557fdc5107df853e31da94e9c53d37f4d2b899e5fb7b6308111493accae88b2659aa33604051600160a060020a03909116815260200160405180910390a15060015b5b90565b600160a060020a03811660009081526003602052604090205460ff165b919050565b600154600160a060020a03165b90565b60015460a060020a900460ff165b90565b600054600160a060020a03165b90565b6000805433600160a060020a0390811691161461034757600080fd5b600160a060020a038216151561035c57600080fd5b60018054600160a060020a031916600160a060020a0384161790557fae3fd6fbd4e7d8a4e53ecf89c51f72c00191a8d8d2c2fba3a5f4d9224996a6ae3383604051600160a060020a039283168152911660208201526040908101905180910390a15060015b5b919050565b6000805433600160a060020a039081169116146103e357600080fd5b6001805460a060020a60ff02191690557fbe8d7a0d2974b6d29c6b0e1f7199c77822dd586b666191ba97458c086c3d2d6433604051600160a060020a03909116815260200160405180910390a15060015b5b90565b60026020908152600092835260408084209091529082529020805460019091015482565b60015460009033600160a060020a0390811691161461047a57600080fd5b6001805460008054600160a060020a0319908116600160a060020a0384161782559091169091557f0d58bef243249903c29496d81a7ffbe3f394735e5ccd3e1dabbfec82c635c8d9903390604051600160a060020a039283168152911660208201526040908101905180910390a15060015b90565b600160a060020a0382166000908152600260209081526040808320848452909152902080546001909101545b92509290505600a165627a7a723058209b8d4e68ab810a828726582c4d0b00137eebb2fb36c22057a5519c538a85492b0029",
+  "networks": {},
+  "schema_version": "0.0.5",
+  "updated_at": 1517039888766
+}
