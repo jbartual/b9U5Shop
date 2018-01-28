@@ -21,8 +21,6 @@ contract Shop is Funded, ProductManager {
     address private root; //Root administrator
     mapping (address => bool) private administrators;
 
-    mapping (address => uint256) private merchantsSales; //account merchant's sales
-
     struct Purchase {
         address[] buyers; //a purchase could be shared by more than one buyer
         address merchant;
@@ -31,7 +29,9 @@ contract Shop is Funded, ProductManager {
         uint256 total; //total sale amount
         uint256 paid; //total paid, specially relevant in case of a shared purchase
     }
-    mapping (bytes32 => Purchase) public purchases; //key = transaction hash
+    mapping (bytes32 => Purchase) private purchases; //key = transaction hash
+
+    uint256 purchaseCounter;
 
         event LogShopNew (address _sender);
     //Constructor
@@ -48,6 +48,14 @@ contract Shop is Funded, ProductManager {
     modifier onlyRoot () { require(msg.sender == root); _; }
     modifier onlyAdministrators () { require(administrators[msg.sender]); _; }
 
+    function isAdministrator (address _administrator)
+        public
+        constant
+        returns (bool _is)
+    {
+        return (administrators[_administrator]);
+    }
+
         event LogShopAddAdministrator (address _sender, address _administrator);
     // To add a new admin
     function addAdministrator (address _administrator)
@@ -57,6 +65,7 @@ contract Shop is Funded, ProductManager {
     {
         require (_administrator != 0);
         administrators[_administrator] = true;
+
         LogShopAddAdministrator (msg.sender, _administrator);
         return true;
     }
@@ -68,67 +77,59 @@ contract Shop is Funded, ProductManager {
         public
         returns (bool _success)
     {
-        require (_administrator != root); //Root cannot be removeAdministrator
+        require (_administrator != root); //root cannot be removed
         administrators[_administrator] = false;
+
         LogShopRemoveAdministrator (msg.sender, _administrator);
         return true;
     }
 
-    function isAdministrator (address _administrator)
-        public
-        constant
-        returns (bool _is)
-    {
-        return (administrators[_administrator]);
-    }
-
+    // Expose internal MerchantManager function
     function addMerchant (address _merchant)
         onlyAdministrators
         public
         returns (bool _success)
     {
-        require(!administrators[_merchant]); // A merchan canot be an administrator
+        require (!administrators[_merchant]); // A merchant cannot be an administrator
 
-        return _addMerchant(_merchant);
+        return _addMerchant(_merchant); //call the internal function in MerchantManager
     }
 
+    // Expose internal MerchantManager function
     function removeMerchant (address _merchant)
         onlyAdministrators
         public
         returns (bool _success)
     {
-        return _removeMerchant(_merchant);
-    }    
-
-    function getMerchantSalesInfo (address _merchant)
-        public
-        constant
-        returns (uint256 _balance)
-    {
-        return (merchantsSales[_merchant]);
+        require (_merchant != root); //root cannot be removed
+        return _removeMerchant(_merchant); //call the internal function in MerchantManager
     }
 
-        event LogShopMerchantWithdrawFunds (address _sender, uint256 _transferAmount);
-    // Merchants withdraw sales funds executing this function
-    // The contract will not send funds to any account, instead merchants shall withdraw funds from the contract themselves
-    function merchantWithdrawFunds ()
-        onlyMerchants
-        onlyIfRunning
+    // Expose internal ProductManager function
+    function addProduct (bytes32 _productId, uint256 _unitPrice, uint _stock)
+        public
+        returns (bool _success)
+    {
+        return _addProduct (_productId, _unitPrice, _stock);
+    }
+
+    // Expose internal ProductManager function
+    function removeProduct (bytes32 _productId)
+        public
+        returns (bool _success)
+    {
+        return _removeProduct (_productId);
+    }
+
+    // Expose internal MerchantManager function
+    function merchantWithdrawAllBalance ()
         public
         returns (bool _success)
     {
         require(msg.sender != root); //the root cannot withdraw his own funds
-        require(merchantsSales[msg.sender] > 0); //require positive merchant balance | prevents re-entry
-
-        uint256 balance = merchantsSales[msg.sender];
-        merchantsSales[msg.sender] = 0; //optimistic accounting
-
-        msg.sender.transfer(balance);
-
-        LogShopMerchantWithdrawFunds (msg.sender, balance);
-        return true;
+        return _withdrawAllBalance();
     }
-
+ 
         event LogShopPurchaseProduct (address _sender, address _merchant, bytes32 _productId, uint _units, uint256 _unitPrice, uint256 _total, uint256 _amount, bytes32 _txHash);
     // The buyer shall have funded his account BEFORE he can purchase any product
     // The buyer shall have enough balance to purchase the products
@@ -152,7 +153,7 @@ contract Shop is Funded, ProductManager {
         txHash = registerPurchase (_merchant, _productId, _units, total, total); //register the purchase
         require(txHash != 0);
 
-        merchantsSales[_merchant] += total; //account the purchase to the merchant
+        _addMerchantSale(_merchant, total); //account the purchase to the merchant
         spendFunds (total); //deduct total from buyer
         //here we could call a delivery function to send the products to the buyer
 
@@ -213,7 +214,7 @@ contract Shop is Funded, ProductManager {
 
         if (paid == total) //if it is completely paid then
         {
-            merchantsSales[purchases[_txHash].merchant] += total; //account the purchase to the merchant
+            _addMerchantSale(purchases[_txHash].merchant, total); //account the purchase to the merchant
             //here we could call a delivery function to send the products to the buyer
             remainingTotal = 0;
         }
@@ -228,7 +229,7 @@ contract Shop is Funded, ProductManager {
         return remainingTotal;
     }
 
-        event LogShopRegisterPurchase (address _sender, address _merchant, bytes32 _productId, uint _units, uint256 _total, uint256 _paid, bytes32 _txHash);
+        event LogShopRegisterPurchase (address indexed _sender, address _merchant, bytes32 _productId, uint _units, uint256 _total, uint256 _paid, bytes32 _txHash);
     //Register the purchase in the struct
     function registerPurchase (address _merchant, bytes32 _productId, uint _units, uint256 _total, uint256 _paid)
         onlyDepositors
@@ -238,7 +239,7 @@ contract Shop is Funded, ProductManager {
     {
         bytes32 txHash;
 
-        txHash = keccak256(_merchant, _productId, _total, msg.data); //create a sales hash
+        txHash = keccak256(_merchant, _productId, purchaseCounter++); //create a sales hash
             purchases[txHash].buyers.push(msg.sender); //register purchase
             purchases[txHash].merchant = _merchant;
             purchases[txHash].productId = _productId;
@@ -247,7 +248,7 @@ contract Shop is Funded, ProductManager {
             purchases[txHash].paid += _paid;
         
         if (products[_merchant][_productId].stock == _units)
-            delete products[_merchant][_productId];
+            products[_merchant][_productId].stock = 0;
         else
             products[_merchant][_productId].stock -= _units; //update stock
 
