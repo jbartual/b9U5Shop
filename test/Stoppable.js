@@ -50,7 +50,7 @@ contract('Stoppable', function(accounts) {
         console.log ("    Is Contract stopped? " + r.toString());
         console.log ("    Stopping contract from accounts[1]...");
         return i.stopContract({from:a1});
-    }).then(() => {
+    }).catch(() => {
         return i.isStopped.call();
     }).then((r) => {
         console.log ("    Is Contract stopped? " + r.toString());
@@ -71,7 +71,7 @@ contract('Stoppable', function(accounts) {
         console.log ("    Is Contract stopped? " + r.toString());
         console.log ("    Resume contract from accounts[1]...");
         return i.resumeContract({from:a1})
-    }).then(() => {
+    }).catch(() => {
         return i.isStopped.call();
     }).then((r) => {
         console.log ("    Is Contract stopped? " + r.toString());

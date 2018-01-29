@@ -52,7 +52,7 @@ contract('Funded', function(accounts) {
         assert.equal (+r, +deposit, "    ERROR: Contract balance shall be " + deposit.toString());
         console.log ("    a2 tries to withdraw funds. a2 fails");
         return i.withdrawFunds(deposit, {from:a2});
-    }).then(() => {
+    }).catch(() => {
         return i.getContractBalance.call();
     }).then ((r) => {
         console.log ("    Contract balance = " + r.toString());
@@ -84,7 +84,7 @@ contract('Funded', function(accounts) {
         console.log ("    a2 depositor balance = " + r.toString());
         console.log ("    a2 tries to withdraw a1's balance...")
         return i.withdrawFunds(deposit, {from:a2});
-    }).then(() => {
+    }).catch(() => {
         console.log ("    Check a1 depositor balance...");
         return i.getDepositorBalance.call(a1);
     }).then ((r) => {

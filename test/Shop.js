@@ -187,7 +187,7 @@ contract('Shop', function(accounts) {
         assert.equal(+r[1], +0, "    ERROR: The product shall have 0 stock");
         console.log ("    a2 buys tries to buy one more unit of the second product. It shall fail as no stock is left...");
         return i.purchaseProduct (a1, p2ProductId, 1, parseInt(p2UnitPrice), {from:a2});
-    }).then(() => {
+    }).catch(() => {
         return i.getDepositorBalance.call(a2);
     }).then((r) => {
         console.log ("    a2 balance in Shop account = " + web3.fromWei(r,"ether").toString());
@@ -289,6 +289,16 @@ contract('Shop', function(accounts) {
     }).then((r) => {
         console.log ("    a1 (merchant) balance in the Shop = " + web3.fromWei(r,"ether").toString());
         assert.equal(+r, +a1UnitPrice, "    ERROR: a1 balance shall be " + a1UnitPrice.toString());
+        console.log ("    a1 withdraws his funds...");
+        return i.merchantWithdrawAllBalance({from:a1});
+    }).then(() => {
+        return i.getMerchantSalesBalance.call(a1);
+    }).then((r) => {
+        console.log ("    a1 balance in Shop account = " + web3.fromWei(r,"ether").toString());
+        assert.equal(+r, 0, "    ERROR: a1 balance shall be 0");
+        return web3.eth.getBalance(a1);
+    }).then((r) => {
+        console.log ("    a1 address balance = " + web3.fromWei(r,"ether").toString());
     });
   });
 });
