@@ -2,6 +2,25 @@
   "contractName": "ProductManager",
   "abi": [
     {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_merchant",
+          "type": "address"
+        }
+      ],
+      "name": "getInfoMerchantSales",
+      "outputs": [
+        {
+          "name": "_balance",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "constant": false,
       "inputs": [],
       "name": "stopContract",
@@ -37,20 +56,6 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "getNewOwner",
-      "outputs": [
-        {
-          "name": "_newOwner",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
       "name": "isStopped",
       "outputs": [
         {
@@ -65,11 +70,52 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "getOwner",
+      "name": "getInfoNewOwner",
+      "outputs": [
+        {
+          "name": "_newOwner",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getInfoOwner",
       "outputs": [
         {
           "name": "_owner",
           "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_merchant",
+          "type": "address"
+        },
+        {
+          "name": "_productID",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getInfoProduct",
+      "outputs": [
+        {
+          "name": "_unitPrice",
+          "type": "uint256"
+        },
+        {
+          "name": "_stock",
+          "type": "uint256"
         }
       ],
       "payable": false,
@@ -107,25 +153,6 @@
       ],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "_merchant",
-          "type": "address"
-        }
-      ],
-      "name": "getMerchantSalesBalance",
-      "outputs": [
-        {
-          "name": "_balance",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -170,33 +197,6 @@
       "type": "function"
     },
     {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "_merchant",
-          "type": "address"
-        },
-        {
-          "name": "_productId",
-          "type": "bytes32"
-        }
-      ],
-      "name": "getProductInfo",
-      "outputs": [
-        {
-          "name": "_unitPrice",
-          "type": "uint256"
-        },
-        {
-          "name": "_stock",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "inputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
@@ -224,7 +224,7 @@
         },
         {
           "indexed": false,
-          "name": "_productId",
+          "name": "_productID",
           "type": "bytes32"
         },
         {
@@ -238,7 +238,7 @@
           "type": "uint256"
         }
       ],
-      "name": "LogProductManager_addProduct",
+      "name": "LogProductManagerAddProduct",
       "type": "event"
     },
     {
@@ -251,11 +251,11 @@
         },
         {
           "indexed": false,
-          "name": "_productId",
+          "name": "_productID",
           "type": "bytes32"
         }
       ],
-      "name": "LogProductManager_removeProduct",
+      "name": "LogProductManagerRemoveProduct",
       "type": "event"
     },
     {
@@ -284,7 +284,7 @@
           "type": "address"
         }
       ],
-      "name": "LogMerchantManager_addMerchant",
+      "name": "LogMerchantManagerAddMerchant",
       "type": "event"
     },
     {
@@ -301,19 +301,19 @@
           "type": "address"
         }
       ],
-      "name": "LogMerchantManager_removeMerchant",
+      "name": "LogMerchantManagerRemoveMerchant",
       "type": "event"
     },
     {
       "anonymous": false,
       "inputs": [
         {
-          "indexed": true,
+          "indexed": false,
           "name": "_sender",
           "type": "address"
         },
         {
-          "indexed": true,
+          "indexed": false,
           "name": "_merchant",
           "type": "address"
         },
@@ -323,14 +323,36 @@
           "type": "uint256"
         }
       ],
-      "name": "LogMerchantManager_addMerchantSale",
+      "name": "LogMerchantManagerAddMerchantSale",
       "type": "event"
     },
     {
       "anonymous": false,
       "inputs": [
         {
-          "indexed": true,
+          "indexed": false,
+          "name": "_sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "_merchant",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "LogMerchantManagerRemoveMerchantSale",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
           "name": "_sender",
           "type": "address"
         },
@@ -340,7 +362,19 @@
           "type": "uint256"
         }
       ],
-      "name": "LogMerchantManager_withdrawAllBalance",
+      "name": "LogMerchantManagerMerchantWithdrawAllBalance",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "_sender",
+          "type": "address"
+        }
+      ],
+      "name": "LogStoppableNew",
       "type": "event"
     },
     {
@@ -414,18 +448,18 @@
       "type": "event"
     }
   ],
-  "bytecode": "0x6060604052341561000f57600080fd5b336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055507f3452aa652f56729b39a9198f36cd36bee3117c0112792f8707bab75d357e66e533604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a16001600260003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060006101000a81548160ff0219169083151502179055507f5327280ec7b0d2b0dad92178eded737206f2ea0c542f7f3b2fa2d0a8ed68456f33604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a17f983587b717c414a68974e2288938cc5e4ea5f8efbad2f692e162ad994acc897033604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a1610abb806101df6000396000f3006060604052600436106100af576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806312253a6c146100b45780631a2f7167146100e15780633e2fe149146101325780633f683b6a14610187578063893d20e8146101b4578063a6f9dae114610209578063c4bc5da51461025a578063c6741a9314610287578063d19a092b146102d4578063eae0438814610335578063fa874a9314610362575b600080fd5b34156100bf57600080fd5b6100c76103c3565b604051808215151515815260200191505060405180910390f35b34156100ec57600080fd5b610118600480803573ffffffffffffffffffffffffffffffffffffffff169060200190919050506104a4565b604051808215151515815260200191505060405180910390f35b341561013d57600080fd5b6101456104fa565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561019257600080fd5b61019a610524565b604051808215151515815260200191505060405180910390f35b34156101bf57600080fd5b6101c761053b565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561021457600080fd5b610240600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091905050610564565b604051808215151515815260200191505060405180910390f35b341561026557600080fd5b61026d6106c8565b604051808215151515815260200191505060405180910390f35b341561029257600080fd5b6102be600480803573ffffffffffffffffffffffffffffffffffffffff169060200190919050506107aa565b6040518082815260200191505060405180910390f35b34156102df57600080fd5b610318600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091908035600019169060200190919050506107f3565b604051808381526020018281526020019250505060405180910390f35b341561034057600080fd5b610348610824565b604051808215151515815260200191505060405180910390f35b341561036d57600080fd5b6103a6600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091908035600019169060200190919050506109c9565b604051808381526020018281526020019250505060405180910390f35b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561042057600080fd5b60018060146101000a81548160ff0219169083151502179055507fdc5107df853e31da94e9c53d37f4d2b899e5fb7b6308111493accae88b2659aa33604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a16001905090565b6000600260008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060009054906101000a900460ff169050919050565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b6000600160149054906101000a900460ff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415156105c157600080fd5b60008273ffffffffffffffffffffffffffffffffffffffff16141515156105e757600080fd5b81600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055507fae3fd6fbd4e7d8a4e53ecf89c51f72c00191a8d8d2c2fba3a5f4d9224996a6ae3383604051808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019250505060405180910390a160019050919050565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561072557600080fd5b6000600160146101000a81548160ff0219169083151502179055507fbe8d7a0d2974b6d29c6b0e1f7199c77822dd586b666191ba97458c086c3d2d6433604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a16001905090565b6000600360008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020549050919050565b6004602052816000526040600020602052806000526040600020600091509150508060000154908060010154905082565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561088257600080fd5b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff166000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550600160006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690557f0d58bef243249903c29496d81a7ffbe3f394735e5ccd3e1dabbfec82c635c8d933600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16604051808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019250505060405180910390a16001905090565b600080600460008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000846000191660001916815260200190815260200160002060000154600460008673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008560001916600019168152602001908152602001600020600101549150915092509290505600a165627a7a723058200af6a4cb3ddef1b68b9f068f106faee8c9c3fd38c427ab1f110b3dc1a1d8042c0029",
-  "deployedBytecode": "0x6060604052600436106100af576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806312253a6c146100b45780631a2f7167146100e15780633e2fe149146101325780633f683b6a14610187578063893d20e8146101b4578063a6f9dae114610209578063c4bc5da51461025a578063c6741a9314610287578063d19a092b146102d4578063eae0438814610335578063fa874a9314610362575b600080fd5b34156100bf57600080fd5b6100c76103c3565b604051808215151515815260200191505060405180910390f35b34156100ec57600080fd5b610118600480803573ffffffffffffffffffffffffffffffffffffffff169060200190919050506104a4565b604051808215151515815260200191505060405180910390f35b341561013d57600080fd5b6101456104fa565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561019257600080fd5b61019a610524565b604051808215151515815260200191505060405180910390f35b34156101bf57600080fd5b6101c761053b565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561021457600080fd5b610240600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091905050610564565b604051808215151515815260200191505060405180910390f35b341561026557600080fd5b61026d6106c8565b604051808215151515815260200191505060405180910390f35b341561029257600080fd5b6102be600480803573ffffffffffffffffffffffffffffffffffffffff169060200190919050506107aa565b6040518082815260200191505060405180910390f35b34156102df57600080fd5b610318600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091908035600019169060200190919050506107f3565b604051808381526020018281526020019250505060405180910390f35b341561034057600080fd5b610348610824565b604051808215151515815260200191505060405180910390f35b341561036d57600080fd5b6103a6600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091908035600019169060200190919050506109c9565b604051808381526020018281526020019250505060405180910390f35b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561042057600080fd5b60018060146101000a81548160ff0219169083151502179055507fdc5107df853e31da94e9c53d37f4d2b899e5fb7b6308111493accae88b2659aa33604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a16001905090565b6000600260008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060009054906101000a900460ff169050919050565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b6000600160149054906101000a900460ff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415156105c157600080fd5b60008273ffffffffffffffffffffffffffffffffffffffff16141515156105e757600080fd5b81600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055507fae3fd6fbd4e7d8a4e53ecf89c51f72c00191a8d8d2c2fba3a5f4d9224996a6ae3383604051808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019250505060405180910390a160019050919050565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561072557600080fd5b6000600160146101000a81548160ff0219169083151502179055507fbe8d7a0d2974b6d29c6b0e1f7199c77822dd586b666191ba97458c086c3d2d6433604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a16001905090565b6000600360008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020549050919050565b6004602052816000526040600020602052806000526040600020600091509150508060000154908060010154905082565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561088257600080fd5b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff166000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550600160006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690557f0d58bef243249903c29496d81a7ffbe3f394735e5ccd3e1dabbfec82c635c8d933600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16604051808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019250505060405180910390a16001905090565b600080600460008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000846000191660001916815260200190815260200160002060000154600460008673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008560001916600019168152602001908152602001600020600101549150915092509290505600a165627a7a723058200af6a4cb3ddef1b68b9f068f106faee8c9c3fd38c427ab1f110b3dc1a1d8042c0029",
-  "sourceMap": "169:1629:6:-;;;473:95;;;;;;;;642:10:4;634:5;;:18;;;;;;;;;;;;;;;;;;663:23;675:10;663:23;;;;;;;;;;;;;;;;;;;;;;421:4:1;397:9;:21;407:10;397:21;;;;;;;;;;;;;;;;:28;;;;;;;;;;;;;;;;;;475:34;498:10;475:34;;;;;;;;;;;;;;;;;;;;;;529:32:6;550:10;529:32;;;;;;;;;;;;;;;;;;;;;;169:1629;;;;;;",
-  "deployedSourceMap": "169:1629:6:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;510:200:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;592:149:1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;292:133:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;283:121:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;160:124:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;892:262;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;820:205:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;747:174:1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;292:65:6;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1356:314:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;578:253:6;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;510:200:5;588:13;488:5:4;;;;;;;;;;;474:19;;:10;:19;;;465:29;;;;;;;;626:4:5;619;;:11;;;;;;;;;;;;;;;;;;643:37;669:10;643:37;;;;;;;;;;;;;;;;;;;;;;698:4;691:11;;510:200;:::o;592:149:1:-;681:8;713:9;:20;723:9;713:20;;;;;;;;;;;;;;;;;;;;;;;;;705:29;;592:149;;;:::o;292:133:4:-;367:17;409:8;;;;;;;;;;;402:15;;292:133;:::o;283:121:5:-;357:10;392:4;;;;;;;;;;;385:11;;283:121;:::o;160:124:4:-;232:14;271:5;;;;;;;;;;;264:12;;160:124;:::o;892:262::-;984:13;488:5;;;;;;;;;;;474:19;;:10;:19;;;465:29;;;;;;;;1036:1;1023:9;:14;;;;1015:23;;;;;;;;1062:9;1051:8;;:20;;;;;;;;;;;;;;;;;;1082:42;1102:10;1114:9;1082:42;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1142:4;1135:11;;892:262;;;:::o;820:205:5:-;900:13;488:5:4;;;;;;;;;;;474:19;;:10;:19;;;465:29;;;;;;;;938:5:5;931:4;;:12;;;;;;;;;;;;;;;;;;956:39;984:10;956:39;;;;;;;;;;;;;;;;;;;;;;1013:4;1006:11;;820:205;:::o;747:174:1:-;849:16;889:13;:24;903:9;889:24;;;;;;;;;;;;;;;;881:33;;747:174;;;:::o;292:65:6:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;1356:314:4:-;1419:13;1472:8;;;;;;;;;;;1458:22;;:10;:22;;;1450:31;;;;;;;;1545:8;;;;;;;;;;;1537:5;;:16;;;;;;;;;;;;;;;;;;1571:8;;1564:15;;;;;;;;;;;1592:48;1619:10;1631:8;;;;;;;;;;;1592:48;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1658:4;1651:11;;1356:314;:::o;578:253:6:-;691:15;708:11;743:8;:19;752:9;743:19;;;;;;;;;;;;;;;:31;763:10;743:31;;;;;;;;;;;;;;;;;:41;;;786:8;:19;795:9;786:19;;;;;;;;;;;;;;;:31;806:10;786:31;;;;;;;;;;;;;;;;;:37;;;735:89;;;;578:253;;;;;:::o",
-  "source": "pragma solidity ^0.4.4;\n\nimport \"./MerchantManager.sol\";\n\n/*\nProduct require of a Merchant as their ID is the same as the ID in the Merchant database for simplicity\n*/\n\ncontract ProductManager is MerchantManager {\n    struct Product {\n        uint256 unitPrice;\n        uint stock;\n    }\n    mapping (address => mapping (bytes32 => Product)) public products; //keys = merchant address, productId\n\n        event LogProductManagerNew (address _sender);\n    //Constructor\n    function ProductManager() \n        public\n    {\n        LogProductManagerNew(msg.sender);\n    }\n    \n    function getProductInfo (address _merchant, bytes32 _productId)\n        public\n        constant\n        returns (uint _unitPrice, uint _stock)\n    {\n        return (products[_merchant][_productId].unitPrice, products[_merchant][_productId].stock);\n    }\n    \n        event LogProductManager_addProduct (address _sender, bytes32 _productId, uint256 _unitPrice, uint _stock);\n    // To add a new product\n    function _addProduct (bytes32 _productId, uint256 _unitPrice, uint _stock)\n        onlyMerchants\n        onlyIfRunning\n        internal\n        returns (bool _success)\n    {\n        products[msg.sender][_productId].unitPrice = _unitPrice;\n        products[msg.sender][_productId].stock += _stock;\n\n        LogProductManager_addProduct (msg.sender, _productId, _unitPrice, _stock);\n        return true;\n    }\n\n        event LogProductManager_removeProduct (address _sender, bytes32 _productId);\n    // To remove a product\n    function _removeProduct (bytes32 _productId)\n        onlyMerchants\n        onlyIfRunning\n        internal\n        returns (bool _success)\n    {\n        delete products[msg.sender][_productId];\n\n        LogProductManager_removeProduct (msg.sender, _productId);\n        return true;\n    }\n\n}",
-  "sourcePath": "/home/jordi/b9/Unit5/Projects/Shop/contracts/ProductManager.sol",
+  "bytecode": "0x6060604052341561000f57600080fd5b336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055507f3452aa652f56729b39a9198f36cd36bee3117c0112792f8707bab75d357e66e533604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a17f8cc00c1f028a34a0114cd2b3c9d9cb40bfaaf3412c080091c5ca0db70b09554f33604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a16001600260003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060006101000a81548160ff0219169083151502179055507f5327280ec7b0d2b0dad92178eded737206f2ea0c542f7f3b2fa2d0a8ed68456f33604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a17f983587b717c414a68974e2288938cc5e4ea5f8efbad2f692e162ad994acc897033604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a1610b42806102426000396000f3006060604052600436106100af576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806306093c3c146100b457806312253a6c146101015780631a2f71671461012e5780633f683b6a1461017f578063585230de146101ac57806369d47ad6146102015780638cf8237314610256578063a6f9dae1146102b7578063c4bc5da514610308578063d19a092b14610335578063eae0438814610396575b600080fd5b34156100bf57600080fd5b6100eb600480803573ffffffffffffffffffffffffffffffffffffffff169060200190919050506103c3565b6040518082815260200191505060405180910390f35b341561010c57600080fd5b610114610431565b604051808215151515815260200191505060405180910390f35b341561013957600080fd5b610165600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091905050610512565b604051808215151515815260200191505060405180910390f35b341561018a57600080fd5b61019261058d565b604051808215151515815260200191505060405180910390f35b34156101b757600080fd5b6101bf6105a4565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561020c57600080fd5b6102146105ce565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561026157600080fd5b61029a600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091908035600019169060200190919050506105f7565b604051808381526020018281526020019250505060405180910390f35b34156102c257600080fd5b6102ee600480803573ffffffffffffffffffffffffffffffffffffffff169060200190919050506106fa565b604051808215151515815260200191505060405180910390f35b341561031357600080fd5b61031b61085e565b604051808215151515815260200191505060405180910390f35b341561034057600080fd5b610379600480803573ffffffffffffffffffffffffffffffffffffffff1690602001909190803560001916906020019091905050610940565b604051808381526020018281526020019250505060405180910390f35b34156103a157600080fd5b6103a9610971565b604051808215151515815260200191505060405180910390f35b6000808273ffffffffffffffffffffffffffffffffffffffff16141515156103ea57600080fd5b600360008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020549050919050565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561048e57600080fd5b60018060146101000a81548160ff0219169083151502179055507fdc5107df853e31da94e9c53d37f4d2b899e5fb7b6308111493accae88b2659aa33604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a16001905090565b6000808273ffffffffffffffffffffffffffffffffffffffff161415151561053957600080fd5b600260008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060009054906101000a900460ff169050919050565b6000600160149054906101000a900460ff16905090565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060008473ffffffffffffffffffffffffffffffffffffffff161415151561062057600080fd5b600060010283600019161415151561063757600080fd5b600460008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000846000191660001916815260200190815260200160002060000154600460008673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000856000191660001916815260200190815260200160002060010154915091509250929050565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561075757600080fd5b60008273ffffffffffffffffffffffffffffffffffffffff161415151561077d57600080fd5b81600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055507fae3fd6fbd4e7d8a4e53ecf89c51f72c00191a8d8d2c2fba3a5f4d9224996a6ae3383604051808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019250505060405180910390a160019050919050565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415156108bb57600080fd5b6000600160146101000a81548160ff0219169083151502179055507fbe8d7a0d2974b6d29c6b0e1f7199c77822dd586b666191ba97458c086c3d2d6433604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a16001905090565b6004602052816000526040600020602052806000526040600020600091509150508060000154908060010154905082565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415156109cf57600080fd5b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff166000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550600160006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690557f0d58bef243249903c29496d81a7ffbe3f394735e5ccd3e1dabbfec82c635c8d933600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16604051808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019250505060405180910390a160019050905600a165627a7a72305820ad2db768d80b60a2e417f7eabbc0dd409d9faa24c825cab520f2c8d55c3eb1710029",
+  "deployedBytecode": "0x6060604052600436106100af576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806306093c3c146100b457806312253a6c146101015780631a2f71671461012e5780633f683b6a1461017f578063585230de146101ac57806369d47ad6146102015780638cf8237314610256578063a6f9dae1146102b7578063c4bc5da514610308578063d19a092b14610335578063eae0438814610396575b600080fd5b34156100bf57600080fd5b6100eb600480803573ffffffffffffffffffffffffffffffffffffffff169060200190919050506103c3565b6040518082815260200191505060405180910390f35b341561010c57600080fd5b610114610431565b604051808215151515815260200191505060405180910390f35b341561013957600080fd5b610165600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091905050610512565b604051808215151515815260200191505060405180910390f35b341561018a57600080fd5b61019261058d565b604051808215151515815260200191505060405180910390f35b34156101b757600080fd5b6101bf6105a4565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561020c57600080fd5b6102146105ce565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b341561026157600080fd5b61029a600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091908035600019169060200190919050506105f7565b604051808381526020018281526020019250505060405180910390f35b34156102c257600080fd5b6102ee600480803573ffffffffffffffffffffffffffffffffffffffff169060200190919050506106fa565b604051808215151515815260200191505060405180910390f35b341561031357600080fd5b61031b61085e565b604051808215151515815260200191505060405180910390f35b341561034057600080fd5b610379600480803573ffffffffffffffffffffffffffffffffffffffff1690602001909190803560001916906020019091905050610940565b604051808381526020018281526020019250505060405180910390f35b34156103a157600080fd5b6103a9610971565b604051808215151515815260200191505060405180910390f35b6000808273ffffffffffffffffffffffffffffffffffffffff16141515156103ea57600080fd5b600360008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020549050919050565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561048e57600080fd5b60018060146101000a81548160ff0219169083151502179055507fdc5107df853e31da94e9c53d37f4d2b899e5fb7b6308111493accae88b2659aa33604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a16001905090565b6000808273ffffffffffffffffffffffffffffffffffffffff161415151561053957600080fd5b600260008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060009054906101000a900460ff169050919050565b6000600160149054906101000a900460ff16905090565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060008473ffffffffffffffffffffffffffffffffffffffff161415151561062057600080fd5b600060010283600019161415151561063757600080fd5b600460008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000846000191660001916815260200190815260200160002060000154600460008673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019081526020016000206000856000191660001916815260200190815260200160002060010154915091509250929050565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561075757600080fd5b60008273ffffffffffffffffffffffffffffffffffffffff161415151561077d57600080fd5b81600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055507fae3fd6fbd4e7d8a4e53ecf89c51f72c00191a8d8d2c2fba3a5f4d9224996a6ae3383604051808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019250505060405180910390a160019050919050565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415156108bb57600080fd5b6000600160146101000a81548160ff0219169083151502179055507fbe8d7a0d2974b6d29c6b0e1f7199c77822dd586b666191ba97458c086c3d2d6433604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a16001905090565b6004602052816000526040600020602052806000526040600020600091509150508060000154908060010154905082565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161415156109cf57600080fd5b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff166000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550600160006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690557f0d58bef243249903c29496d81a7ffbe3f394735e5ccd3e1dabbfec82c635c8d933600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16604051808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020019250505060405180910390a160019050905600a165627a7a72305820ad2db768d80b60a2e417f7eabbc0dd409d9faa24c825cab520f2c8d55c3eb1710029",
+  "sourceMap": "321:1818:4:-;;;651:95;;;;;;;;642:10:3;634:5;;:18;;;;;;;;;;;;;;;;;;663:23;675:10;663:23;;;;;;;;;;;;;;;;;;;;;;814:28:5;831:10;814:28;;;;;;;;;;;;;;;;;;;;;;882:4:2;858:9;:21;868:10;858:21;;;;;;;;;;;;;;;;:28;;;;;;;;;;;;;;;;;;936:34;959:10;936:34;;;;;;;;;;;;;;;;;;;;;;707:32:4;728:10;707:32;;;;;;;;;;;;;;;;;;;;;;321:1818;;;;;;",
+  "deployedSourceMap": "321:1818:4:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4309:203:2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;964:200:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4111:192:2;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1519:121:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1866:137:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1730:128;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1814:323:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;904:262:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1282:205:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;441:65:4;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1380:314:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4309:203:2;4408:13;4459:1;4446:9;:14;;;;4437:24;;;;;;;;4480:13;:24;4494:9;4480:24;;;;;;;;;;;;;;;;4472:33;;4309:203;;;:::o;964:200:5:-;1042:13;459:5:3;;;;;;;;;;;445:19;;:10;:19;;;436:29;;;;;;;;1080:4:5;1073;;:11;;;;;;;;;;;;;;;;;;1097:37;1123:10;1097:37;;;;;;;;;;;;;;;;;;;;;;1152:4;1145:11;;964:200;:::o;4111:192:2:-;4200:8;4246:1;4233:9;:14;;;;4224:24;;;;;;;;4275:9;:20;4285:9;4275:20;;;;;;;;;;;;;;;;;;;;;;;;;4267:29;;4111:192;;;:::o;1519:121:5:-;1593:10;1628:4;;;;;;;;;;;1621:11;;1519:121;:::o;1866:137:3:-;1945:17;1987:8;;;;;;;;;;;1980:15;;1866:137;:::o;1730:128::-;1806:14;1845:5;;;;;;;;;;;1838:12;;1730:128;:::o;1814:323:4:-;1927:15;1944:11;1993:1;1980:9;:14;;;;1971:24;;;;;;;;2028:1;2014:15;;:10;:15;;;;;2005:25;;;;;;;;2049:8;:19;2058:9;2049:19;;;;;;;;;;;;;;;:31;2069:10;2049:31;;;;;;;;;;;;;;;;;:41;;;2092:8;:19;2101:9;2092:19;;;;;;;;;;;;;;;:31;2112:10;2092:31;;;;;;;;;;;;;;;;;:37;;;2041:89;;;;1814:323;;;;;:::o;904:262:3:-;996:13;459:5;;;;;;;;;;;445:19;;:10;:19;;;436:29;;;;;;;;1048:1;1035:9;:14;;;;1027:23;;;;;;;;1074:9;1063:8;;:20;;;;;;;;;;;;;;;;;;1094:42;1114:10;1126:9;1094:42;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1154:4;1147:11;;904:262;;;:::o;1282:205:5:-;1362:13;459:5:3;;;;;;;;;;;445:19;;:10;:19;;;436:29;;;;;;;;1400:5:5;1393:4;;:12;;;;;;;;;;;;;;;;;;1418:39;1446:10;1418:39;;;;;;;;;;;;;;;;;;;;;;1475:4;1468:11;;1282:205;:::o;441:65:4:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;1380:314:3:-;1443:13;1496:8;;;;;;;;;;;1482:22;;:10;:22;;;1474:31;;;;;;;;1569:8;;;;;;;;;;;1561:5;;:16;;;;;;;;;;;;;;;;;;1595:8;;1588:15;;;;;;;;;;;1616:48;1643:10;1655:8;;;;;;;;;;;1616:48;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1682:4;1675:11;;1380:314;:::o",
+  "source": "pragma solidity ^0.4.4;\n\n/*\n\nLast Update: 2018-02-06\nVersion: 2.0\n\nSuper contract to manage Merchants that sell products in a shop.\nProduct are managed in the Products Manager contract.\n\nCORE functions:\n- Constructor\n- addProduct\n- removeProduct\n\nSUPPORT functions\n- getInfoProduct\n\n*/\n\nimport \"./_MerchantManager.sol\";\n\ncontract ProductManager is MerchantManager {\n    struct Product {\n        uint unitPrice;\n        uint stock;\n    }\n    mapping (address => mapping (bytes32 => Product)) public products; //merchant address => productID => Product\n\n// CORE functions\n\n        event LogProductManagerNew (address _sender);\n        //Constructor\n    function ProductManager() \n        public\n    {\n        LogProductManagerNew(msg.sender);\n    }\n    \n        event LogProductManagerAddProduct (address _sender, bytes32 _productID, uint _unitPrice, uint _stock);\n        // To add a new product\n    function addProduct (bytes32 _productID, uint _unitPrice, uint _stock)\n        onlyMerchants\n        onlyIfRunning\n        internal\n        returns (bool _success)\n    {\n        require (_productID != 0);\n\n        products[msg.sender][_productID].unitPrice = _unitPrice;\n        products[msg.sender][_productID].stock += _stock;\n\n        LogProductManagerAddProduct (msg.sender, _productID, _unitPrice, _stock);\n        return true;\n    }\n\n        event LogProductManagerRemoveProduct (address _sender, bytes32 _productID);\n        // To remove a product\n    function removeProduct (bytes32 _productID)\n        onlyMerchants\n        onlyIfRunning\n        internal\n        returns (bool _success)\n    {\n        require (_productID != 0);\n        \n        delete products[msg.sender][_productID];\n\n        LogProductManagerRemoveProduct (msg.sender, _productID);\n        return true;\n    }\n\n// SUPPORT functions\n\n    function getInfoProduct (address _merchant, bytes32 _productID)\n        constant\n        public\n        returns (uint _unitPrice, uint _stock)\n    {\n        require (_merchant != 0);\n        require (_productID != 0);\n\n        return (products[_merchant][_productID].unitPrice, products[_merchant][_productID].stock);\n    }\n}",
+  "sourcePath": "/home/jordi/b9/Unit5/Projects/Shop/contracts/_ProductManager.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/home/jordi/b9/Unit5/Projects/Shop/contracts/ProductManager.sol",
+      "absolutePath": "/home/jordi/b9/Unit5/Projects/Shop/contracts/_ProductManager.sol",
       "exportedSymbols": {
         "ProductManager": [
-          1162
+          2108
         ]
       }
     },
@@ -439,43 +473,43 @@
             ".4"
           ]
         },
-        "id": 1018,
+        "id": 1940,
         "name": "PragmaDirective",
-        "src": "0:23:6"
+        "src": "0:23:4"
       },
       {
         "attributes": {
-          "SourceUnit": 249,
-          "absolutePath": "/home/jordi/b9/Unit5/Projects/Shop/contracts/MerchantManager.sol",
-          "file": "./MerchantManager.sol",
-          "scope": 1163,
+          "SourceUnit": 1819,
+          "absolutePath": "/home/jordi/b9/Unit5/Projects/Shop/contracts/_MerchantManager.sol",
+          "file": "./_MerchantManager.sol",
+          "scope": 2109,
           "symbolAliases": [
             null
           ],
           "unitAlias": ""
         },
-        "id": 1019,
+        "id": 1941,
         "name": "ImportDirective",
-        "src": "25:31:6"
+        "src": "287:32:4"
       },
       {
         "attributes": {
           "contractDependencies": [
-            248,
-            941,
-            1016
+            1818,
+            1938,
+            2192
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            1162,
-            248,
-            1016,
-            941
+            2108,
+            1818,
+            2192,
+            1938
           ],
           "name": "ProductManager",
-          "scope": 1163
+          "scope": 2109
         },
         "children": [
           {
@@ -489,23 +523,23 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "MerchantManager",
-                  "referencedDeclaration": 248,
+                  "referencedDeclaration": 1818,
                   "type": "contract MerchantManager"
                 },
-                "id": 1020,
+                "id": 1942,
                 "name": "UserDefinedTypeName",
-                "src": "196:15:6"
+                "src": "348:15:4"
               }
             ],
-            "id": 1021,
+            "id": 1943,
             "name": "InheritanceSpecifier",
-            "src": "196:15:6"
+            "src": "348:15:4"
           },
           {
             "attributes": {
               "canonicalName": "ProductManager.Product",
               "name": "Product",
-              "scope": 1162,
+              "scope": 2108,
               "visibility": "public"
             },
             "children": [
@@ -513,33 +547,7 @@
                 "attributes": {
                   "constant": false,
                   "name": "unitPrice",
-                  "scope": 1026,
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "type": "uint256",
-                  "value": null,
-                  "visibility": "internal"
-                },
-                "children": [
-                  {
-                    "attributes": {
-                      "name": "uint256",
-                      "type": "uint256"
-                    },
-                    "id": 1022,
-                    "name": "ElementaryTypeName",
-                    "src": "243:7:6"
-                  }
-                ],
-                "id": 1023,
-                "name": "VariableDeclaration",
-                "src": "243:17:6"
-              },
-              {
-                "attributes": {
-                  "constant": false,
-                  "name": "stock",
-                  "scope": 1026,
+                  "scope": 1948,
                   "stateVariable": false,
                   "storageLocation": "default",
                   "type": "uint256",
@@ -552,25 +560,51 @@
                       "name": "uint",
                       "type": "uint256"
                     },
-                    "id": 1024,
+                    "id": 1944,
                     "name": "ElementaryTypeName",
-                    "src": "270:4:6"
+                    "src": "395:4:4"
                   }
                 ],
-                "id": 1025,
+                "id": 1945,
                 "name": "VariableDeclaration",
-                "src": "270:10:6"
+                "src": "395:14:4"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "name": "stock",
+                  "scope": 1948,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint256",
+                  "value": null,
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint",
+                      "type": "uint256"
+                    },
+                    "id": 1946,
+                    "name": "ElementaryTypeName",
+                    "src": "419:4:4"
+                  }
+                ],
+                "id": 1947,
+                "name": "VariableDeclaration",
+                "src": "419:10:4"
               }
             ],
-            "id": 1026,
+            "id": 1948,
             "name": "StructDefinition",
-            "src": "218:69:6"
+            "src": "370:66:4"
           },
           {
             "attributes": {
               "constant": false,
               "name": "products",
-              "scope": 1162,
+              "scope": 2108,
               "stateVariable": true,
               "storageLocation": "default",
               "type": "mapping(address => mapping(bytes32 => struct ProductManager.Product storage ref))",
@@ -588,9 +622,9 @@
                       "name": "address",
                       "type": "address"
                     },
-                    "id": 1027,
+                    "id": 1949,
                     "name": "ElementaryTypeName",
-                    "src": "301:7:6"
+                    "src": "450:7:4"
                   },
                   {
                     "attributes": {
@@ -602,35 +636,35 @@
                           "name": "bytes32",
                           "type": "bytes32"
                         },
-                        "id": 1028,
+                        "id": 1950,
                         "name": "ElementaryTypeName",
-                        "src": "321:7:6"
+                        "src": "470:7:4"
                       },
                       {
                         "attributes": {
                           "contractScope": null,
                           "name": "Product",
-                          "referencedDeclaration": 1026,
+                          "referencedDeclaration": 1948,
                           "type": "struct ProductManager.Product storage pointer"
                         },
-                        "id": 1029,
+                        "id": 1951,
                         "name": "UserDefinedTypeName",
-                        "src": "332:7:6"
+                        "src": "481:7:4"
                       }
                     ],
-                    "id": 1030,
+                    "id": 1952,
                     "name": "Mapping",
-                    "src": "312:28:6"
+                    "src": "461:28:4"
                   }
                 ],
-                "id": 1031,
+                "id": 1953,
                 "name": "Mapping",
-                "src": "292:49:6"
+                "src": "441:49:4"
               }
             ],
-            "id": 1032,
+            "id": 1954,
             "name": "VariableDeclaration",
-            "src": "292:65:6"
+            "src": "441:65:4"
           },
           {
             "attributes": {
@@ -645,7 +679,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "_sender",
-                      "scope": 1036,
+                      "scope": 1958,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -658,24 +692,24 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 1033,
+                        "id": 1955,
                         "name": "ElementaryTypeName",
-                        "src": "433:7:6"
+                        "src": "607:7:4"
                       }
                     ],
-                    "id": 1034,
+                    "id": 1956,
                     "name": "VariableDeclaration",
-                    "src": "433:15:6"
+                    "src": "607:15:4"
                   }
                 ],
-                "id": 1035,
+                "id": 1957,
                 "name": "ParameterList",
-                "src": "432:17:6"
+                "src": "606:17:4"
               }
             ],
-            "id": 1036,
+            "id": 1958,
             "name": "EventDefinition",
-            "src": "405:45:6"
+            "src": "579:45:4"
           },
           {
             "attributes": {
@@ -687,7 +721,7 @@
               ],
               "name": "ProductManager",
               "payable": false,
-              "scope": 1162,
+              "scope": 2108,
               "stateMutability": "nonpayable",
               "superFunction": null,
               "visibility": "public"
@@ -700,9 +734,9 @@
                   ]
                 },
                 "children": [],
-                "id": 1037,
+                "id": 1959,
                 "name": "ParameterList",
-                "src": "496:2:6"
+                "src": "674:2:4"
               },
               {
                 "attributes": {
@@ -711,9 +745,9 @@
                   ]
                 },
                 "children": [],
-                "id": 1038,
+                "id": 1960,
                 "name": "ParameterList",
-                "src": "519:0:6"
+                "src": "697:0:4"
               },
               {
                 "children": [
@@ -745,13 +779,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 1036,
+                              "referencedDeclaration": 1958,
                               "type": "function (address)",
                               "value": "LogProductManagerNew"
                             },
-                            "id": 1039,
+                            "id": 1961,
                             "name": "Identifier",
-                            "src": "529:20:6"
+                            "src": "707:20:4"
                           },
                           {
                             "attributes": {
@@ -771,393 +805,43 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 1922,
+                                  "referencedDeclaration": 2204,
                                   "type": "msg",
                                   "value": "msg"
                                 },
-                                "id": 1040,
+                                "id": 1962,
                                 "name": "Identifier",
-                                "src": "550:3:6"
+                                "src": "728:3:4"
                               }
                             ],
-                            "id": 1041,
+                            "id": 1963,
                             "name": "MemberAccess",
-                            "src": "550:10:6"
+                            "src": "728:10:4"
                           }
                         ],
-                        "id": 1042,
+                        "id": 1964,
                         "name": "FunctionCall",
-                        "src": "529:32:6"
+                        "src": "707:32:4"
                       }
                     ],
-                    "id": 1043,
+                    "id": 1965,
                     "name": "ExpressionStatement",
-                    "src": "529:32:6"
+                    "src": "707:32:4"
                   }
                 ],
-                "id": 1044,
+                "id": 1966,
                 "name": "Block",
-                "src": "519:49:6"
+                "src": "697:49:4"
               }
             ],
-            "id": 1045,
+            "id": 1967,
             "name": "FunctionDefinition",
-            "src": "473:95:6"
-          },
-          {
-            "attributes": {
-              "constant": true,
-              "implemented": true,
-              "isConstructor": false,
-              "modifiers": [
-                null
-              ],
-              "name": "getProductInfo",
-              "payable": false,
-              "scope": 1162,
-              "stateMutability": "view",
-              "superFunction": null,
-              "visibility": "public"
-            },
-            "children": [
-              {
-                "children": [
-                  {
-                    "attributes": {
-                      "constant": false,
-                      "name": "_merchant",
-                      "scope": 1071,
-                      "stateVariable": false,
-                      "storageLocation": "default",
-                      "type": "address",
-                      "value": null,
-                      "visibility": "internal"
-                    },
-                    "children": [
-                      {
-                        "attributes": {
-                          "name": "address",
-                          "type": "address"
-                        },
-                        "id": 1046,
-                        "name": "ElementaryTypeName",
-                        "src": "603:7:6"
-                      }
-                    ],
-                    "id": 1047,
-                    "name": "VariableDeclaration",
-                    "src": "603:17:6"
-                  },
-                  {
-                    "attributes": {
-                      "constant": false,
-                      "name": "_productId",
-                      "scope": 1071,
-                      "stateVariable": false,
-                      "storageLocation": "default",
-                      "type": "bytes32",
-                      "value": null,
-                      "visibility": "internal"
-                    },
-                    "children": [
-                      {
-                        "attributes": {
-                          "name": "bytes32",
-                          "type": "bytes32"
-                        },
-                        "id": 1048,
-                        "name": "ElementaryTypeName",
-                        "src": "622:7:6"
-                      }
-                    ],
-                    "id": 1049,
-                    "name": "VariableDeclaration",
-                    "src": "622:18:6"
-                  }
-                ],
-                "id": 1050,
-                "name": "ParameterList",
-                "src": "602:39:6"
-              },
-              {
-                "children": [
-                  {
-                    "attributes": {
-                      "constant": false,
-                      "name": "_unitPrice",
-                      "scope": 1071,
-                      "stateVariable": false,
-                      "storageLocation": "default",
-                      "type": "uint256",
-                      "value": null,
-                      "visibility": "internal"
-                    },
-                    "children": [
-                      {
-                        "attributes": {
-                          "name": "uint",
-                          "type": "uint256"
-                        },
-                        "id": 1051,
-                        "name": "ElementaryTypeName",
-                        "src": "691:4:6"
-                      }
-                    ],
-                    "id": 1052,
-                    "name": "VariableDeclaration",
-                    "src": "691:15:6"
-                  },
-                  {
-                    "attributes": {
-                      "constant": false,
-                      "name": "_stock",
-                      "scope": 1071,
-                      "stateVariable": false,
-                      "storageLocation": "default",
-                      "type": "uint256",
-                      "value": null,
-                      "visibility": "internal"
-                    },
-                    "children": [
-                      {
-                        "attributes": {
-                          "name": "uint",
-                          "type": "uint256"
-                        },
-                        "id": 1053,
-                        "name": "ElementaryTypeName",
-                        "src": "708:4:6"
-                      }
-                    ],
-                    "id": 1054,
-                    "name": "VariableDeclaration",
-                    "src": "708:11:6"
-                  }
-                ],
-                "id": 1055,
-                "name": "ParameterList",
-                "src": "690:30:6"
-              },
-              {
-                "children": [
-                  {
-                    "attributes": {
-                      "functionReturnParameters": 1055
-                    },
-                    "children": [
-                      {
-                        "attributes": {
-                          "argumentTypes": null,
-                          "isConstant": false,
-                          "isInlineArray": false,
-                          "isLValue": false,
-                          "isPure": false,
-                          "lValueRequested": false,
-                          "type": "tuple(uint256,uint256)"
-                        },
-                        "children": [
-                          {
-                            "attributes": {
-                              "argumentTypes": null,
-                              "isConstant": false,
-                              "isLValue": true,
-                              "isPure": false,
-                              "lValueRequested": false,
-                              "member_name": "unitPrice",
-                              "referencedDeclaration": 1023,
-                              "type": "uint256"
-                            },
-                            "children": [
-                              {
-                                "attributes": {
-                                  "argumentTypes": null,
-                                  "isConstant": false,
-                                  "isLValue": true,
-                                  "isPure": false,
-                                  "lValueRequested": false,
-                                  "type": "struct ProductManager.Product storage ref"
-                                },
-                                "children": [
-                                  {
-                                    "attributes": {
-                                      "argumentTypes": null,
-                                      "isConstant": false,
-                                      "isLValue": true,
-                                      "isPure": false,
-                                      "lValueRequested": false,
-                                      "type": "mapping(bytes32 => struct ProductManager.Product storage ref)"
-                                    },
-                                    "children": [
-                                      {
-                                        "attributes": {
-                                          "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
-                                          "referencedDeclaration": 1032,
-                                          "type": "mapping(address => mapping(bytes32 => struct ProductManager.Product storage ref))",
-                                          "value": "products"
-                                        },
-                                        "id": 1056,
-                                        "name": "Identifier",
-                                        "src": "743:8:6"
-                                      },
-                                      {
-                                        "attributes": {
-                                          "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
-                                          "referencedDeclaration": 1047,
-                                          "type": "address",
-                                          "value": "_merchant"
-                                        },
-                                        "id": 1057,
-                                        "name": "Identifier",
-                                        "src": "752:9:6"
-                                      }
-                                    ],
-                                    "id": 1058,
-                                    "name": "IndexAccess",
-                                    "src": "743:19:6"
-                                  },
-                                  {
-                                    "attributes": {
-                                      "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
-                                      "referencedDeclaration": 1049,
-                                      "type": "bytes32",
-                                      "value": "_productId"
-                                    },
-                                    "id": 1059,
-                                    "name": "Identifier",
-                                    "src": "763:10:6"
-                                  }
-                                ],
-                                "id": 1060,
-                                "name": "IndexAccess",
-                                "src": "743:31:6"
-                              }
-                            ],
-                            "id": 1061,
-                            "name": "MemberAccess",
-                            "src": "743:41:6"
-                          },
-                          {
-                            "attributes": {
-                              "argumentTypes": null,
-                              "isConstant": false,
-                              "isLValue": true,
-                              "isPure": false,
-                              "lValueRequested": false,
-                              "member_name": "stock",
-                              "referencedDeclaration": 1025,
-                              "type": "uint256"
-                            },
-                            "children": [
-                              {
-                                "attributes": {
-                                  "argumentTypes": null,
-                                  "isConstant": false,
-                                  "isLValue": true,
-                                  "isPure": false,
-                                  "lValueRequested": false,
-                                  "type": "struct ProductManager.Product storage ref"
-                                },
-                                "children": [
-                                  {
-                                    "attributes": {
-                                      "argumentTypes": null,
-                                      "isConstant": false,
-                                      "isLValue": true,
-                                      "isPure": false,
-                                      "lValueRequested": false,
-                                      "type": "mapping(bytes32 => struct ProductManager.Product storage ref)"
-                                    },
-                                    "children": [
-                                      {
-                                        "attributes": {
-                                          "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
-                                          "referencedDeclaration": 1032,
-                                          "type": "mapping(address => mapping(bytes32 => struct ProductManager.Product storage ref))",
-                                          "value": "products"
-                                        },
-                                        "id": 1062,
-                                        "name": "Identifier",
-                                        "src": "786:8:6"
-                                      },
-                                      {
-                                        "attributes": {
-                                          "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
-                                          "referencedDeclaration": 1047,
-                                          "type": "address",
-                                          "value": "_merchant"
-                                        },
-                                        "id": 1063,
-                                        "name": "Identifier",
-                                        "src": "795:9:6"
-                                      }
-                                    ],
-                                    "id": 1064,
-                                    "name": "IndexAccess",
-                                    "src": "786:19:6"
-                                  },
-                                  {
-                                    "attributes": {
-                                      "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
-                                      "referencedDeclaration": 1049,
-                                      "type": "bytes32",
-                                      "value": "_productId"
-                                    },
-                                    "id": 1065,
-                                    "name": "Identifier",
-                                    "src": "806:10:6"
-                                  }
-                                ],
-                                "id": 1066,
-                                "name": "IndexAccess",
-                                "src": "786:31:6"
-                              }
-                            ],
-                            "id": 1067,
-                            "name": "MemberAccess",
-                            "src": "786:37:6"
-                          }
-                        ],
-                        "id": 1068,
-                        "name": "TupleExpression",
-                        "src": "742:82:6"
-                      }
-                    ],
-                    "id": 1069,
-                    "name": "Return",
-                    "src": "735:89:6"
-                  }
-                ],
-                "id": 1070,
-                "name": "Block",
-                "src": "725:106:6"
-              }
-            ],
-            "id": 1071,
-            "name": "FunctionDefinition",
-            "src": "578:253:6"
+            "src": "651:95:4"
           },
           {
             "attributes": {
               "anonymous": false,
-              "name": "LogProductManager_addProduct"
+              "name": "LogProductManagerAddProduct"
             },
             "children": [
               {
@@ -1167,7 +851,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "_sender",
-                      "scope": 1081,
+                      "scope": 1977,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -1180,21 +864,21 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 1072,
+                        "id": 1968,
                         "name": "ElementaryTypeName",
-                        "src": "881:7:6"
+                        "src": "795:7:4"
                       }
                     ],
-                    "id": 1073,
+                    "id": 1969,
                     "name": "VariableDeclaration",
-                    "src": "881:15:6"
+                    "src": "795:15:4"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "indexed": false,
-                      "name": "_productId",
-                      "scope": 1081,
+                      "name": "_productID",
+                      "scope": 1977,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes32",
@@ -1207,48 +891,21 @@
                           "name": "bytes32",
                           "type": "bytes32"
                         },
-                        "id": 1074,
+                        "id": 1970,
                         "name": "ElementaryTypeName",
-                        "src": "898:7:6"
+                        "src": "812:7:4"
                       }
                     ],
-                    "id": 1075,
+                    "id": 1971,
                     "name": "VariableDeclaration",
-                    "src": "898:18:6"
+                    "src": "812:18:4"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "indexed": false,
                       "name": "_unitPrice",
-                      "scope": 1081,
-                      "stateVariable": false,
-                      "storageLocation": "default",
-                      "type": "uint256",
-                      "value": null,
-                      "visibility": "internal"
-                    },
-                    "children": [
-                      {
-                        "attributes": {
-                          "name": "uint256",
-                          "type": "uint256"
-                        },
-                        "id": 1076,
-                        "name": "ElementaryTypeName",
-                        "src": "918:7:6"
-                      }
-                    ],
-                    "id": 1077,
-                    "name": "VariableDeclaration",
-                    "src": "918:18:6"
-                  },
-                  {
-                    "attributes": {
-                      "constant": false,
-                      "indexed": false,
-                      "name": "_stock",
-                      "scope": 1081,
+                      "scope": 1977,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -1261,33 +918,60 @@
                           "name": "uint",
                           "type": "uint256"
                         },
-                        "id": 1078,
+                        "id": 1972,
                         "name": "ElementaryTypeName",
-                        "src": "938:4:6"
+                        "src": "832:4:4"
                       }
                     ],
-                    "id": 1079,
+                    "id": 1973,
                     "name": "VariableDeclaration",
-                    "src": "938:11:6"
+                    "src": "832:15:4"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": false,
+                      "name": "_stock",
+                      "scope": 1977,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 1974,
+                        "name": "ElementaryTypeName",
+                        "src": "849:4:4"
+                      }
+                    ],
+                    "id": 1975,
+                    "name": "VariableDeclaration",
+                    "src": "849:11:4"
                   }
                 ],
-                "id": 1080,
+                "id": 1976,
                 "name": "ParameterList",
-                "src": "880:70:6"
+                "src": "794:67:4"
               }
             ],
-            "id": 1081,
+            "id": 1977,
             "name": "EventDefinition",
-            "src": "845:106:6"
+            "src": "760:102:4"
           },
           {
             "attributes": {
               "constant": false,
               "implemented": true,
               "isConstructor": false,
-              "name": "_addProduct",
+              "name": "addProduct",
               "payable": false,
-              "scope": 1162,
+              "scope": 2108,
               "stateMutability": "nonpayable",
               "superFunction": null,
               "visibility": "internal"
@@ -1298,8 +982,8 @@
                   {
                     "attributes": {
                       "constant": false,
-                      "name": "_productId",
-                      "scope": 1127,
+                      "name": "_productID",
+                      "scope": 2029,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes32",
@@ -1312,46 +996,20 @@
                           "name": "bytes32",
                           "type": "bytes32"
                         },
-                        "id": 1082,
+                        "id": 1978,
                         "name": "ElementaryTypeName",
-                        "src": "1006:7:6"
+                        "src": "920:7:4"
                       }
                     ],
-                    "id": 1083,
+                    "id": 1979,
                     "name": "VariableDeclaration",
-                    "src": "1006:18:6"
+                    "src": "920:18:4"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "name": "_unitPrice",
-                      "scope": 1127,
-                      "stateVariable": false,
-                      "storageLocation": "default",
-                      "type": "uint256",
-                      "value": null,
-                      "visibility": "internal"
-                    },
-                    "children": [
-                      {
-                        "attributes": {
-                          "name": "uint256",
-                          "type": "uint256"
-                        },
-                        "id": 1084,
-                        "name": "ElementaryTypeName",
-                        "src": "1026:7:6"
-                      }
-                    ],
-                    "id": 1085,
-                    "name": "VariableDeclaration",
-                    "src": "1026:18:6"
-                  },
-                  {
-                    "attributes": {
-                      "constant": false,
-                      "name": "_stock",
-                      "scope": 1127,
+                      "scope": 2029,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -1364,19 +1022,45 @@
                           "name": "uint",
                           "type": "uint256"
                         },
-                        "id": 1086,
+                        "id": 1980,
                         "name": "ElementaryTypeName",
-                        "src": "1046:4:6"
+                        "src": "940:4:4"
                       }
                     ],
-                    "id": 1087,
+                    "id": 1981,
                     "name": "VariableDeclaration",
-                    "src": "1046:11:6"
+                    "src": "940:15:4"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_stock",
+                      "scope": 2029,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 1982,
+                        "name": "ElementaryTypeName",
+                        "src": "957:4:4"
+                      }
+                    ],
+                    "id": 1983,
+                    "name": "VariableDeclaration",
+                    "src": "957:11:4"
                   }
                 ],
-                "id": 1088,
+                "id": 1984,
                 "name": "ParameterList",
-                "src": "1005:53:6"
+                "src": "919:50:4"
               },
               {
                 "children": [
@@ -1384,7 +1068,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_success",
-                      "scope": 1127,
+                      "scope": 2029,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bool",
@@ -1397,19 +1081,19 @@
                           "name": "bool",
                           "type": "bool"
                         },
-                        "id": 1093,
+                        "id": 1989,
                         "name": "ElementaryTypeName",
-                        "src": "1137:4:6"
+                        "src": "1048:4:4"
                       }
                     ],
-                    "id": 1094,
+                    "id": 1990,
                     "name": "VariableDeclaration",
-                    "src": "1137:13:6"
+                    "src": "1048:13:4"
                   }
                 ],
-                "id": 1095,
+                "id": 1991,
                 "name": "ParameterList",
-                "src": "1136:15:6"
+                "src": "1047:15:4"
               },
               {
                 "attributes": {
@@ -1424,18 +1108,18 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 60,
+                      "referencedDeclaration": 1512,
                       "type": "modifier ()",
                       "value": "onlyMerchants"
                     },
-                    "id": 1089,
+                    "id": 1985,
                     "name": "Identifier",
-                    "src": "1067:13:6"
+                    "src": "978:13:4"
                   }
                 ],
-                "id": 1090,
+                "id": 1986,
                 "name": "ModifierInvocation",
-                "src": "1067:13:6"
+                "src": "978:13:4"
               },
               {
                 "attributes": {
@@ -1450,21 +1134,118 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 961,
+                      "referencedDeclaration": 2124,
                       "type": "modifier ()",
                       "value": "onlyIfRunning"
                     },
-                    "id": 1091,
+                    "id": 1987,
                     "name": "Identifier",
-                    "src": "1089:13:6"
+                    "src": "1000:13:4"
                   }
                 ],
-                "id": 1092,
+                "id": 1988,
                 "name": "ModifierInvocation",
-                "src": "1089:13:6"
+                "src": "1000:13:4"
               },
               {
                 "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bool",
+                                  "typeString": "bool"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 2207,
+                              "type": "function (bool) pure",
+                              "value": "require"
+                            },
+                            "id": 1992,
+                            "name": "Identifier",
+                            "src": "1077:7:4"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "commonType": {
+                                "typeIdentifier": "t_bytes32",
+                                "typeString": "bytes32"
+                              },
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "operator": "!=",
+                              "type": "bool"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 1979,
+                                  "type": "bytes32",
+                                  "value": "_productID"
+                                },
+                                "id": 1993,
+                                "name": "Identifier",
+                                "src": "1086:10:4"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "30",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "number",
+                                  "type": "int_const 0",
+                                  "value": "0"
+                                },
+                                "id": 1994,
+                                "name": "Literal",
+                                "src": "1100:1:4"
+                              }
+                            ],
+                            "id": 1995,
+                            "name": "BinaryOperation",
+                            "src": "1086:15:4"
+                          }
+                        ],
+                        "id": 1996,
+                        "name": "FunctionCall",
+                        "src": "1077:25:4"
+                      }
+                    ],
+                    "id": 1997,
+                    "name": "ExpressionStatement",
+                    "src": "1077:25:4"
+                  },
                   {
                     "children": [
                       {
@@ -1486,7 +1267,7 @@
                               "isPure": false,
                               "lValueRequested": true,
                               "member_name": "unitPrice",
-                              "referencedDeclaration": 1023,
+                              "referencedDeclaration": 1945,
                               "type": "uint256"
                             },
                             "children": [
@@ -1516,13 +1297,13 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 1032,
+                                          "referencedDeclaration": 1954,
                                           "type": "mapping(address => mapping(bytes32 => struct ProductManager.Product storage ref))",
                                           "value": "products"
                                         },
-                                        "id": 1096,
+                                        "id": 1998,
                                         "name": "Identifier",
-                                        "src": "1166:8:6"
+                                        "src": "1113:8:4"
                                       },
                                       {
                                         "attributes": {
@@ -1542,23 +1323,23 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 1922,
+                                              "referencedDeclaration": 2204,
                                               "type": "msg",
                                               "value": "msg"
                                             },
-                                            "id": 1097,
+                                            "id": 1999,
                                             "name": "Identifier",
-                                            "src": "1175:3:6"
+                                            "src": "1122:3:4"
                                           }
                                         ],
-                                        "id": 1098,
+                                        "id": 2000,
                                         "name": "MemberAccess",
-                                        "src": "1175:10:6"
+                                        "src": "1122:10:4"
                                       }
                                     ],
-                                    "id": 1100,
+                                    "id": 2002,
                                     "name": "IndexAccess",
-                                    "src": "1166:20:6"
+                                    "src": "1113:20:4"
                                   },
                                   {
                                     "attributes": {
@@ -1566,23 +1347,23 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 1083,
+                                      "referencedDeclaration": 1979,
                                       "type": "bytes32",
-                                      "value": "_productId"
+                                      "value": "_productID"
                                     },
-                                    "id": 1099,
+                                    "id": 2001,
                                     "name": "Identifier",
-                                    "src": "1187:10:6"
+                                    "src": "1134:10:4"
                                   }
                                 ],
-                                "id": 1101,
+                                "id": 2003,
                                 "name": "IndexAccess",
-                                "src": "1166:32:6"
+                                "src": "1113:32:4"
                               }
                             ],
-                            "id": 1102,
+                            "id": 2004,
                             "name": "MemberAccess",
-                            "src": "1166:42:6"
+                            "src": "1113:42:4"
                           },
                           {
                             "attributes": {
@@ -1590,23 +1371,23 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 1085,
+                              "referencedDeclaration": 1981,
                               "type": "uint256",
                               "value": "_unitPrice"
                             },
-                            "id": 1103,
+                            "id": 2005,
                             "name": "Identifier",
-                            "src": "1211:10:6"
+                            "src": "1158:10:4"
                           }
                         ],
-                        "id": 1104,
+                        "id": 2006,
                         "name": "Assignment",
-                        "src": "1166:55:6"
+                        "src": "1113:55:4"
                       }
                     ],
-                    "id": 1105,
+                    "id": 2007,
                     "name": "ExpressionStatement",
-                    "src": "1166:55:6"
+                    "src": "1113:55:4"
                   },
                   {
                     "children": [
@@ -1629,7 +1410,7 @@
                               "isPure": false,
                               "lValueRequested": true,
                               "member_name": "stock",
-                              "referencedDeclaration": 1025,
+                              "referencedDeclaration": 1947,
                               "type": "uint256"
                             },
                             "children": [
@@ -1659,13 +1440,13 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 1032,
+                                          "referencedDeclaration": 1954,
                                           "type": "mapping(address => mapping(bytes32 => struct ProductManager.Product storage ref))",
                                           "value": "products"
                                         },
-                                        "id": 1106,
+                                        "id": 2008,
                                         "name": "Identifier",
-                                        "src": "1231:8:6"
+                                        "src": "1178:8:4"
                                       },
                                       {
                                         "attributes": {
@@ -1685,23 +1466,23 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 1922,
+                                              "referencedDeclaration": 2204,
                                               "type": "msg",
                                               "value": "msg"
                                             },
-                                            "id": 1107,
+                                            "id": 2009,
                                             "name": "Identifier",
-                                            "src": "1240:3:6"
+                                            "src": "1187:3:4"
                                           }
                                         ],
-                                        "id": 1108,
+                                        "id": 2010,
                                         "name": "MemberAccess",
-                                        "src": "1240:10:6"
+                                        "src": "1187:10:4"
                                       }
                                     ],
-                                    "id": 1110,
+                                    "id": 2012,
                                     "name": "IndexAccess",
-                                    "src": "1231:20:6"
+                                    "src": "1178:20:4"
                                   },
                                   {
                                     "attributes": {
@@ -1709,23 +1490,23 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 1083,
+                                      "referencedDeclaration": 1979,
                                       "type": "bytes32",
-                                      "value": "_productId"
+                                      "value": "_productID"
                                     },
-                                    "id": 1109,
+                                    "id": 2011,
                                     "name": "Identifier",
-                                    "src": "1252:10:6"
+                                    "src": "1199:10:4"
                                   }
                                 ],
-                                "id": 1111,
+                                "id": 2013,
                                 "name": "IndexAccess",
-                                "src": "1231:32:6"
+                                "src": "1178:32:4"
                               }
                             ],
-                            "id": 1112,
+                            "id": 2014,
                             "name": "MemberAccess",
-                            "src": "1231:38:6"
+                            "src": "1178:38:4"
                           },
                           {
                             "attributes": {
@@ -1733,23 +1514,23 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 1087,
+                              "referencedDeclaration": 1983,
                               "type": "uint256",
                               "value": "_stock"
                             },
-                            "id": 1113,
+                            "id": 2015,
                             "name": "Identifier",
-                            "src": "1273:6:6"
+                            "src": "1220:6:4"
                           }
                         ],
-                        "id": 1114,
+                        "id": 2016,
                         "name": "Assignment",
-                        "src": "1231:48:6"
+                        "src": "1178:48:4"
                       }
                     ],
-                    "id": 1115,
+                    "id": 2017,
                     "name": "ExpressionStatement",
-                    "src": "1231:48:6"
+                    "src": "1178:48:4"
                   },
                   {
                     "children": [
@@ -1791,13 +1572,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 1081,
+                              "referencedDeclaration": 1977,
                               "type": "function (address,bytes32,uint256,uint256)",
-                              "value": "LogProductManager_addProduct"
+                              "value": "LogProductManagerAddProduct"
                             },
-                            "id": 1116,
+                            "id": 2018,
                             "name": "Identifier",
-                            "src": "1290:28:6"
+                            "src": "1237:27:4"
                           },
                           {
                             "attributes": {
@@ -1817,18 +1598,18 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 1922,
+                                  "referencedDeclaration": 2204,
                                   "type": "msg",
                                   "value": "msg"
                                 },
-                                "id": 1117,
+                                "id": 2019,
                                 "name": "Identifier",
-                                "src": "1320:3:6"
+                                "src": "1266:3:4"
                               }
                             ],
-                            "id": 1118,
+                            "id": 2020,
                             "name": "MemberAccess",
-                            "src": "1320:10:6"
+                            "src": "1266:10:4"
                           },
                           {
                             "attributes": {
@@ -1836,13 +1617,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 1083,
+                              "referencedDeclaration": 1979,
                               "type": "bytes32",
-                              "value": "_productId"
+                              "value": "_productID"
                             },
-                            "id": 1119,
+                            "id": 2021,
                             "name": "Identifier",
-                            "src": "1332:10:6"
+                            "src": "1278:10:4"
                           },
                           {
                             "attributes": {
@@ -1850,13 +1631,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 1085,
+                              "referencedDeclaration": 1981,
                               "type": "uint256",
                               "value": "_unitPrice"
                             },
-                            "id": 1120,
+                            "id": 2022,
                             "name": "Identifier",
-                            "src": "1344:10:6"
+                            "src": "1290:10:4"
                           },
                           {
                             "attributes": {
@@ -1864,27 +1645,27 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 1087,
+                              "referencedDeclaration": 1983,
                               "type": "uint256",
                               "value": "_stock"
                             },
-                            "id": 1121,
+                            "id": 2023,
                             "name": "Identifier",
-                            "src": "1356:6:6"
+                            "src": "1302:6:4"
                           }
                         ],
-                        "id": 1122,
+                        "id": 2024,
                         "name": "FunctionCall",
-                        "src": "1290:73:6"
+                        "src": "1237:72:4"
                       }
                     ],
-                    "id": 1123,
+                    "id": 2025,
                     "name": "ExpressionStatement",
-                    "src": "1290:73:6"
+                    "src": "1237:72:4"
                   },
                   {
                     "attributes": {
-                      "functionReturnParameters": 1095
+                      "functionReturnParameters": 1991
                     },
                     "children": [
                       {
@@ -1900,29 +1681,29 @@
                           "type": "bool",
                           "value": "true"
                         },
-                        "id": 1124,
+                        "id": 2026,
                         "name": "Literal",
-                        "src": "1380:4:6"
+                        "src": "1326:4:4"
                       }
                     ],
-                    "id": 1125,
+                    "id": 2027,
                     "name": "Return",
-                    "src": "1373:11:6"
+                    "src": "1319:11:4"
                   }
                 ],
-                "id": 1126,
+                "id": 2028,
                 "name": "Block",
-                "src": "1156:235:6"
+                "src": "1067:270:4"
               }
             ],
-            "id": 1127,
+            "id": 2029,
             "name": "FunctionDefinition",
-            "src": "984:407:6"
+            "src": "899:438:4"
           },
           {
             "attributes": {
               "anonymous": false,
-              "name": "LogProductManager_removeProduct"
+              "name": "LogProductManagerRemoveProduct"
             },
             "children": [
               {
@@ -1932,7 +1713,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "_sender",
-                      "scope": 1133,
+                      "scope": 2035,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -1945,21 +1726,21 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 1128,
+                        "id": 2030,
                         "name": "ElementaryTypeName",
-                        "src": "1440:7:6"
+                        "src": "1385:7:4"
                       }
                     ],
-                    "id": 1129,
+                    "id": 2031,
                     "name": "VariableDeclaration",
-                    "src": "1440:15:6"
+                    "src": "1385:15:4"
                   },
                   {
                     "attributes": {
                       "constant": false,
                       "indexed": false,
-                      "name": "_productId",
-                      "scope": 1133,
+                      "name": "_productID",
+                      "scope": 2035,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes32",
@@ -1972,33 +1753,33 @@
                           "name": "bytes32",
                           "type": "bytes32"
                         },
-                        "id": 1130,
+                        "id": 2032,
                         "name": "ElementaryTypeName",
-                        "src": "1457:7:6"
+                        "src": "1402:7:4"
                       }
                     ],
-                    "id": 1131,
+                    "id": 2033,
                     "name": "VariableDeclaration",
-                    "src": "1457:18:6"
+                    "src": "1402:18:4"
                   }
                 ],
-                "id": 1132,
+                "id": 2034,
                 "name": "ParameterList",
-                "src": "1439:37:6"
+                "src": "1384:37:4"
               }
             ],
-            "id": 1133,
+            "id": 2035,
             "name": "EventDefinition",
-            "src": "1401:76:6"
+            "src": "1347:75:4"
           },
           {
             "attributes": {
               "constant": false,
               "implemented": true,
               "isConstructor": false,
-              "name": "_removeProduct",
+              "name": "removeProduct",
               "payable": false,
-              "scope": 1162,
+              "scope": 2108,
               "stateMutability": "nonpayable",
               "superFunction": null,
               "visibility": "internal"
@@ -2009,8 +1790,8 @@
                   {
                     "attributes": {
                       "constant": false,
-                      "name": "_productId",
-                      "scope": 1161,
+                      "name": "_productID",
+                      "scope": 2069,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes32",
@@ -2023,19 +1804,19 @@
                           "name": "bytes32",
                           "type": "bytes32"
                         },
-                        "id": 1134,
+                        "id": 2036,
                         "name": "ElementaryTypeName",
-                        "src": "1534:7:6"
+                        "src": "1482:7:4"
                       }
                     ],
-                    "id": 1135,
+                    "id": 2037,
                     "name": "VariableDeclaration",
-                    "src": "1534:18:6"
+                    "src": "1482:18:4"
                   }
                 ],
-                "id": 1136,
+                "id": 2038,
                 "name": "ParameterList",
-                "src": "1533:20:6"
+                "src": "1481:20:4"
               },
               {
                 "children": [
@@ -2043,7 +1824,7 @@
                     "attributes": {
                       "constant": false,
                       "name": "_success",
-                      "scope": 1161,
+                      "scope": 2069,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bool",
@@ -2056,19 +1837,19 @@
                           "name": "bool",
                           "type": "bool"
                         },
-                        "id": 1141,
+                        "id": 2043,
                         "name": "ElementaryTypeName",
-                        "src": "1632:4:6"
+                        "src": "1580:4:4"
                       }
                     ],
-                    "id": 1142,
+                    "id": 2044,
                     "name": "VariableDeclaration",
-                    "src": "1632:13:6"
+                    "src": "1580:13:4"
                   }
                 ],
-                "id": 1143,
+                "id": 2045,
                 "name": "ParameterList",
-                "src": "1631:15:6"
+                "src": "1579:15:4"
               },
               {
                 "attributes": {
@@ -2083,18 +1864,18 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 60,
+                      "referencedDeclaration": 1512,
                       "type": "modifier ()",
                       "value": "onlyMerchants"
                     },
-                    "id": 1137,
+                    "id": 2039,
                     "name": "Identifier",
-                    "src": "1562:13:6"
+                    "src": "1510:13:4"
                   }
                 ],
-                "id": 1138,
+                "id": 2040,
                 "name": "ModifierInvocation",
-                "src": "1562:13:6"
+                "src": "1510:13:4"
               },
               {
                 "attributes": {
@@ -2109,21 +1890,118 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 961,
+                      "referencedDeclaration": 2124,
                       "type": "modifier ()",
                       "value": "onlyIfRunning"
                     },
-                    "id": 1139,
+                    "id": 2041,
                     "name": "Identifier",
-                    "src": "1584:13:6"
+                    "src": "1532:13:4"
                   }
                 ],
-                "id": 1140,
+                "id": 2042,
                 "name": "ModifierInvocation",
-                "src": "1584:13:6"
+                "src": "1532:13:4"
               },
               {
                 "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bool",
+                                  "typeString": "bool"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 2207,
+                              "type": "function (bool) pure",
+                              "value": "require"
+                            },
+                            "id": 2046,
+                            "name": "Identifier",
+                            "src": "1609:7:4"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "commonType": {
+                                "typeIdentifier": "t_bytes32",
+                                "typeString": "bytes32"
+                              },
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "operator": "!=",
+                              "type": "bool"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2037,
+                                  "type": "bytes32",
+                                  "value": "_productID"
+                                },
+                                "id": 2047,
+                                "name": "Identifier",
+                                "src": "1618:10:4"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "30",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "number",
+                                  "type": "int_const 0",
+                                  "value": "0"
+                                },
+                                "id": 2048,
+                                "name": "Literal",
+                                "src": "1632:1:4"
+                              }
+                            ],
+                            "id": 2049,
+                            "name": "BinaryOperation",
+                            "src": "1618:15:4"
+                          }
+                        ],
+                        "id": 2050,
+                        "name": "FunctionCall",
+                        "src": "1609:25:4"
+                      }
+                    ],
+                    "id": 2051,
+                    "name": "ExpressionStatement",
+                    "src": "1609:25:4"
+                  },
                   {
                     "children": [
                       {
@@ -2164,13 +2042,13 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 1032,
+                                      "referencedDeclaration": 1954,
                                       "type": "mapping(address => mapping(bytes32 => struct ProductManager.Product storage ref))",
                                       "value": "products"
                                     },
-                                    "id": 1144,
+                                    "id": 2052,
                                     "name": "Identifier",
-                                    "src": "1668:8:6"
+                                    "src": "1660:8:4"
                                   },
                                   {
                                     "attributes": {
@@ -2190,23 +2068,23 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 1922,
+                                          "referencedDeclaration": 2204,
                                           "type": "msg",
                                           "value": "msg"
                                         },
-                                        "id": 1145,
+                                        "id": 2053,
                                         "name": "Identifier",
-                                        "src": "1677:3:6"
+                                        "src": "1669:3:4"
                                       }
                                     ],
-                                    "id": 1146,
+                                    "id": 2054,
                                     "name": "MemberAccess",
-                                    "src": "1677:10:6"
+                                    "src": "1669:10:4"
                                   }
                                 ],
-                                "id": 1147,
+                                "id": 2055,
                                 "name": "IndexAccess",
-                                "src": "1668:20:6"
+                                "src": "1660:20:4"
                               },
                               {
                                 "attributes": {
@@ -2214,28 +2092,28 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 1135,
+                                  "referencedDeclaration": 2037,
                                   "type": "bytes32",
-                                  "value": "_productId"
+                                  "value": "_productID"
                                 },
-                                "id": 1148,
+                                "id": 2056,
                                 "name": "Identifier",
-                                "src": "1689:10:6"
+                                "src": "1681:10:4"
                               }
                             ],
-                            "id": 1149,
+                            "id": 2057,
                             "name": "IndexAccess",
-                            "src": "1668:32:6"
+                            "src": "1660:32:4"
                           }
                         ],
-                        "id": 1150,
+                        "id": 2058,
                         "name": "UnaryOperation",
-                        "src": "1661:39:6"
+                        "src": "1653:39:4"
                       }
                     ],
-                    "id": 1151,
+                    "id": 2059,
                     "name": "ExpressionStatement",
-                    "src": "1661:39:6"
+                    "src": "1653:39:4"
                   },
                   {
                     "children": [
@@ -2269,13 +2147,13 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 1133,
+                              "referencedDeclaration": 2035,
                               "type": "function (address,bytes32)",
-                              "value": "LogProductManager_removeProduct"
+                              "value": "LogProductManagerRemoveProduct"
                             },
-                            "id": 1152,
+                            "id": 2060,
                             "name": "Identifier",
-                            "src": "1711:31:6"
+                            "src": "1703:30:4"
                           },
                           {
                             "attributes": {
@@ -2295,18 +2173,18 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 1922,
+                                  "referencedDeclaration": 2204,
                                   "type": "msg",
                                   "value": "msg"
                                 },
-                                "id": 1153,
+                                "id": 2061,
                                 "name": "Identifier",
-                                "src": "1744:3:6"
+                                "src": "1735:3:4"
                               }
                             ],
-                            "id": 1154,
+                            "id": 2062,
                             "name": "MemberAccess",
-                            "src": "1744:10:6"
+                            "src": "1735:10:4"
                           },
                           {
                             "attributes": {
@@ -2314,27 +2192,27 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 1135,
+                              "referencedDeclaration": 2037,
                               "type": "bytes32",
-                              "value": "_productId"
+                              "value": "_productID"
                             },
-                            "id": 1155,
+                            "id": 2063,
                             "name": "Identifier",
-                            "src": "1756:10:6"
+                            "src": "1747:10:4"
                           }
                         ],
-                        "id": 1156,
+                        "id": 2064,
                         "name": "FunctionCall",
-                        "src": "1711:56:6"
+                        "src": "1703:55:4"
                       }
                     ],
-                    "id": 1157,
+                    "id": 2065,
                     "name": "ExpressionStatement",
-                    "src": "1711:56:6"
+                    "src": "1703:55:4"
                   },
                   {
                     "attributes": {
-                      "functionReturnParameters": 1143
+                      "functionReturnParameters": 2045
                     },
                     "children": [
                       {
@@ -2350,40 +2228,595 @@
                           "type": "bool",
                           "value": "true"
                         },
-                        "id": 1158,
+                        "id": 2066,
                         "name": "Literal",
-                        "src": "1784:4:6"
+                        "src": "1775:4:4"
                       }
                     ],
-                    "id": 1159,
+                    "id": 2067,
                     "name": "Return",
-                    "src": "1777:11:6"
+                    "src": "1768:11:4"
                   }
                 ],
-                "id": 1160,
+                "id": 2068,
                 "name": "Block",
-                "src": "1651:144:6"
+                "src": "1599:187:4"
               }
             ],
-            "id": 1161,
+            "id": 2069,
             "name": "FunctionDefinition",
-            "src": "1509:286:6"
+            "src": "1458:328:4"
+          },
+          {
+            "attributes": {
+              "constant": true,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "getInfoProduct",
+              "payable": false,
+              "scope": 2108,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_merchant",
+                      "scope": 2107,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 2070,
+                        "name": "ElementaryTypeName",
+                        "src": "1839:7:4"
+                      }
+                    ],
+                    "id": 2071,
+                    "name": "VariableDeclaration",
+                    "src": "1839:17:4"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_productID",
+                      "scope": 2107,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bytes32",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bytes32",
+                          "type": "bytes32"
+                        },
+                        "id": 2072,
+                        "name": "ElementaryTypeName",
+                        "src": "1858:7:4"
+                      }
+                    ],
+                    "id": 2073,
+                    "name": "VariableDeclaration",
+                    "src": "1858:18:4"
+                  }
+                ],
+                "id": 2074,
+                "name": "ParameterList",
+                "src": "1838:39:4"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_unitPrice",
+                      "scope": 2107,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 2075,
+                        "name": "ElementaryTypeName",
+                        "src": "1927:4:4"
+                      }
+                    ],
+                    "id": 2076,
+                    "name": "VariableDeclaration",
+                    "src": "1927:15:4"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_stock",
+                      "scope": 2107,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 2077,
+                        "name": "ElementaryTypeName",
+                        "src": "1944:4:4"
+                      }
+                    ],
+                    "id": 2078,
+                    "name": "VariableDeclaration",
+                    "src": "1944:11:4"
+                  }
+                ],
+                "id": 2079,
+                "name": "ParameterList",
+                "src": "1926:30:4"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bool",
+                                  "typeString": "bool"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 2207,
+                              "type": "function (bool) pure",
+                              "value": "require"
+                            },
+                            "id": 2080,
+                            "name": "Identifier",
+                            "src": "1971:7:4"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "commonType": {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              },
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "operator": "!=",
+                              "type": "bool"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2071,
+                                  "type": "address",
+                                  "value": "_merchant"
+                                },
+                                "id": 2081,
+                                "name": "Identifier",
+                                "src": "1980:9:4"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "30",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "number",
+                                  "type": "int_const 0",
+                                  "value": "0"
+                                },
+                                "id": 2082,
+                                "name": "Literal",
+                                "src": "1993:1:4"
+                              }
+                            ],
+                            "id": 2083,
+                            "name": "BinaryOperation",
+                            "src": "1980:14:4"
+                          }
+                        ],
+                        "id": 2084,
+                        "name": "FunctionCall",
+                        "src": "1971:24:4"
+                      }
+                    ],
+                    "id": 2085,
+                    "name": "ExpressionStatement",
+                    "src": "1971:24:4"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bool",
+                                  "typeString": "bool"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 2207,
+                              "type": "function (bool) pure",
+                              "value": "require"
+                            },
+                            "id": 2086,
+                            "name": "Identifier",
+                            "src": "2005:7:4"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "commonType": {
+                                "typeIdentifier": "t_bytes32",
+                                "typeString": "bytes32"
+                              },
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "operator": "!=",
+                              "type": "bool"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2073,
+                                  "type": "bytes32",
+                                  "value": "_productID"
+                                },
+                                "id": 2087,
+                                "name": "Identifier",
+                                "src": "2014:10:4"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "30",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "number",
+                                  "type": "int_const 0",
+                                  "value": "0"
+                                },
+                                "id": 2088,
+                                "name": "Literal",
+                                "src": "2028:1:4"
+                              }
+                            ],
+                            "id": 2089,
+                            "name": "BinaryOperation",
+                            "src": "2014:15:4"
+                          }
+                        ],
+                        "id": 2090,
+                        "name": "FunctionCall",
+                        "src": "2005:25:4"
+                      }
+                    ],
+                    "id": 2091,
+                    "name": "ExpressionStatement",
+                    "src": "2005:25:4"
+                  },
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 2079
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isInlineArray": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "type": "tuple(uint256,uint256)"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "unitPrice",
+                              "referencedDeclaration": 1945,
+                              "type": "uint256"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "type": "struct ProductManager.Product storage ref"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "isConstant": false,
+                                      "isLValue": true,
+                                      "isPure": false,
+                                      "lValueRequested": false,
+                                      "type": "mapping(bytes32 => struct ProductManager.Product storage ref)"
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "overloadedDeclarations": [
+                                            null
+                                          ],
+                                          "referencedDeclaration": 1954,
+                                          "type": "mapping(address => mapping(bytes32 => struct ProductManager.Product storage ref))",
+                                          "value": "products"
+                                        },
+                                        "id": 2092,
+                                        "name": "Identifier",
+                                        "src": "2049:8:4"
+                                      },
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "overloadedDeclarations": [
+                                            null
+                                          ],
+                                          "referencedDeclaration": 2071,
+                                          "type": "address",
+                                          "value": "_merchant"
+                                        },
+                                        "id": 2093,
+                                        "name": "Identifier",
+                                        "src": "2058:9:4"
+                                      }
+                                    ],
+                                    "id": 2094,
+                                    "name": "IndexAccess",
+                                    "src": "2049:19:4"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 2073,
+                                      "type": "bytes32",
+                                      "value": "_productID"
+                                    },
+                                    "id": 2095,
+                                    "name": "Identifier",
+                                    "src": "2069:10:4"
+                                  }
+                                ],
+                                "id": 2096,
+                                "name": "IndexAccess",
+                                "src": "2049:31:4"
+                              }
+                            ],
+                            "id": 2097,
+                            "name": "MemberAccess",
+                            "src": "2049:41:4"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "stock",
+                              "referencedDeclaration": 1947,
+                              "type": "uint256"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "type": "struct ProductManager.Product storage ref"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "isConstant": false,
+                                      "isLValue": true,
+                                      "isPure": false,
+                                      "lValueRequested": false,
+                                      "type": "mapping(bytes32 => struct ProductManager.Product storage ref)"
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "overloadedDeclarations": [
+                                            null
+                                          ],
+                                          "referencedDeclaration": 1954,
+                                          "type": "mapping(address => mapping(bytes32 => struct ProductManager.Product storage ref))",
+                                          "value": "products"
+                                        },
+                                        "id": 2098,
+                                        "name": "Identifier",
+                                        "src": "2092:8:4"
+                                      },
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "overloadedDeclarations": [
+                                            null
+                                          ],
+                                          "referencedDeclaration": 2071,
+                                          "type": "address",
+                                          "value": "_merchant"
+                                        },
+                                        "id": 2099,
+                                        "name": "Identifier",
+                                        "src": "2101:9:4"
+                                      }
+                                    ],
+                                    "id": 2100,
+                                    "name": "IndexAccess",
+                                    "src": "2092:19:4"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 2073,
+                                      "type": "bytes32",
+                                      "value": "_productID"
+                                    },
+                                    "id": 2101,
+                                    "name": "Identifier",
+                                    "src": "2112:10:4"
+                                  }
+                                ],
+                                "id": 2102,
+                                "name": "IndexAccess",
+                                "src": "2092:31:4"
+                              }
+                            ],
+                            "id": 2103,
+                            "name": "MemberAccess",
+                            "src": "2092:37:4"
+                          }
+                        ],
+                        "id": 2104,
+                        "name": "TupleExpression",
+                        "src": "2048:82:4"
+                      }
+                    ],
+                    "id": 2105,
+                    "name": "Return",
+                    "src": "2041:89:4"
+                  }
+                ],
+                "id": 2106,
+                "name": "Block",
+                "src": "1961:176:4"
+              }
+            ],
+            "id": 2107,
+            "name": "FunctionDefinition",
+            "src": "1814:323:4"
           }
         ],
-        "id": 1162,
+        "id": 2108,
         "name": "ContractDefinition",
-        "src": "169:1629:6"
+        "src": "321:1818:4"
       }
     ],
-    "id": 1163,
+    "id": 2109,
     "name": "SourceUnit",
-    "src": "0:1798:6"
+    "src": "0:2139:4"
   },
   "compiler": {
     "name": "solc",
     "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "1517930747625": {
+      "events": {},
+      "links": {},
+      "address": "0xb6781bcc5a1797803bbddf90ef0146643e9cae76"
+    },
+    "1517997370727": {
+      "events": {},
+      "links": {},
+      "address": "0x048ac6cf727f03bdf0567027ce1a47d63dca5948"
+    }
+  },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-28T20:32:35.426Z"
+  "updatedAt": "2018-02-07T11:05:53.618Z"
 }
